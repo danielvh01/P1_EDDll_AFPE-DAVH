@@ -1,0 +1,11 @@
+﻿<div class="row">
+    <div class="col-md-8 offset-2">
+        <h2>Chat rooms</h2>
+        <ul class=" list-group">
+            @foreach (var e in P1_EDDll_AFPE_DAVH.Controllers.ChatController.Rooms)
+            {
+                <li class="list-group-item"><a href="~/Chat/Room?room=@e.Key">@e.Value</a></li>
+            }
+        </ul>
+    </div>
+</div>
