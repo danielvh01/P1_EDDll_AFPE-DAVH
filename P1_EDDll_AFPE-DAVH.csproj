@@ -5,4 +5,16 @@
     <RootNamespace>P1_EDDll_AFPE_DAVH</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="API_DataTransfer\**" />
+    <Content Remove="API_DataTransfer\**" />
+    <EmbeddedResource Remove="API_DataTransfer\**" />
+    <None Remove="API_DataTransfer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.13.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
 </Project>

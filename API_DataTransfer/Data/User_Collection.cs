@@ -36,7 +36,7 @@ namespace API_DataTransfer.Data
 
         public async Task PutUser(User _user)
         {
-            Builders<User> filter = Builders<User>.Filter.Eq(x => x.id, _user.id);
+            var filter = Builders<User>.Filter.Eq(x => x.Id, _user.Id);
             await collection.ReplaceOneAsync(filter,_user);
         }
     }
