@@ -8,7 +8,7 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace API_DataTransfer.Models
 {
     public class User
-    {//
+    {
         [BsonId]
         public ObjectId Id { get; set; }
 
@@ -16,6 +16,7 @@ namespace API_DataTransfer.Models
         public string Password { get; set; }
         public List<string> Contacts { get; set; }
         public List<string> ConnectionRequests { get; set; }
+        public List<ChatRoom> Chats { get; set; }
         public int k1 { get; }
         public int k2 { get; }
 
