@@ -24,7 +24,7 @@ namespace API_DataTransfer.Data
             await collection.InsertOneAsync(_User);
         }
 
-        public async Task<List<User>> GetUsersList()
+        public async Task<List<User>> GetContactsList()
         {
             return await collection.FindAsync(new BsonDocument()).Result.ToListAsync();
         }
