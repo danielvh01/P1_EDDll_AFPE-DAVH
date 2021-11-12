@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P1_EDDll_AFPE-DAVH", "P1_ED
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API_DataTransfer", "API_DataTransfer\API_DataTransfer.csproj", "{FD65927E-EC90-45F2-9AFA-0B6077083E2C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStructures", "DataStructures\DataStructures.csproj", "{D678CE2C-30B0-4DEA-8DD6-0D582C66353A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{FD65927E-EC90-45F2-9AFA-0B6077083E2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD65927E-EC90-45F2-9AFA-0B6077083E2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD65927E-EC90-45F2-9AFA-0B6077083E2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D678CE2C-30B0-4DEA-8DD6-0D582C66353A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D678CE2C-30B0-4DEA-8DD6-0D582C66353A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D678CE2C-30B0-4DEA-8DD6-0D582C66353A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D678CE2C-30B0-4DEA-8DD6-0D582C66353A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
