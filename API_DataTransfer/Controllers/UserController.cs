@@ -60,6 +60,16 @@ namespace API_DataTransfer.Controllers
             return BadRequest();
         }
 
-        
+        [HttpPut]
+        public async Task<IActionResult> UpdateUser([FromBody] JsonElement Juser)
+        {
+            User _user = JsonSerializer.Deserialize<User>(Juser.ToString());
+            if (_user == null)
+            {
+                return BadRequest();
+            }
+            await usersDB.PutUser(_user);
+            return Ok();
+        }
     }
 }
