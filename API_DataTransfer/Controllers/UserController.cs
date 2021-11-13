@@ -12,24 +12,18 @@ using Microsoft.AspNetCore.Http;
 
 namespace API_DataTransfer.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/user")]
     [ApiController]
     public class UserController : ControllerBase
     {
         User_Collection usersDB = new User_Collection();
-
-        [HttpGet]
-        public async Task<IActionResult> GetUsers()
-        {
-            return Ok(JsonSerializer.Serialize(await usersDB.GetContactsList()));
-        }
-
-        // GET api/<UserController>/5
+        
+        
         [HttpGet("{username}")]
         public async Task<IActionResult> GetSpecifiedUser(string user)
         {
-            List<User> AllUsers = usersDB.GetContactsList().Result.ToList();
-            var FindUser = AllUsers.Find(x => x.Username == user);
+            List<User> AllUsers = usersDB.GetAllUsers().Result.ToList();
+            var FindUser = AllUsers.Find(x => x.Username == user);            
             return Ok(JsonSerializer.Serialize(await usersDB.GetUserFromID(FindUser.Id.ToString())));
         }
 
@@ -37,7 +31,7 @@ namespace API_DataTransfer.Controllers
         public async Task<IActionResult> AddUser(JsonElement Juser)
         {
             User _user = JsonSerializer.Deserialize<User>(Juser.ToString());
-            List<User> UserRegistry = usersDB.GetContactsList().Result.ToList();
+            List<User> UserRegistry = usersDB.GetAllUsers().Result.ToList();
             //Verify if the username exists
             for (int i = 0; i < UserRegistry.Count; i++)
             {
@@ -47,6 +41,23 @@ namespace API_DataTransfer.Controllers
             }
             await usersDB.AddUsers(_user);
             return Created("Created", true);
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] JsonElement Juser)
+        {
+            string JsonObj = Juser.ToString();
+            User user = JsonSerializer.Deserialize<User>(JsonObj);
+            List<User> UserRegistry = usersDB.GetAllUsers().Result.ToList();
+            for (int i = 0; i < UserRegistry.Count; i++)
+            {
+                if (UserRegistry.ElementAt(i).Username == user.Username && UserRegistry.ElementAt(i).Password == user.Password)
+                {
+                    var FindUser = UserRegistry.Find(x => x.Username == user.Username);
+                    return Ok(JsonSerializer.Serialize(await usersDB.GetUserFromID(FindUser.Id.ToString())));
+                }
+            }
+            return BadRequest();
         }
 
         
