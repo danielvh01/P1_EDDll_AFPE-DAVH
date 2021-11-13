@@ -24,6 +24,15 @@ a {
   border-color: #1861ac;
 }
 
+.btn-principal {
+    font-variant-caps: titling-caps;
+    color: white;
+    background-color: black;
+    border-radius: 5px;
+    border: 0px;
+    margin: 5px;
+}
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
@@ -50,6 +59,9 @@ button.accept-policy {
   font-size: 1rem;
   line-height: inherit;
 }
+
+.formgroup 
+
 
 /* Sticky footer styles
 -------------------------------------------------- */

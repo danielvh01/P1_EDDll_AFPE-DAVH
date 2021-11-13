@@ -16,8 +16,8 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
 {
     public class UserController : Controller
     {
-        User_Collection db = new User_Collection();
-        Starter.Starter api = new Starter.Starter();
+        const string SessionID = "_UID";
+
         // GET: UserController
         public ActionResult Index()
         {
@@ -33,6 +33,40 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         // GET: UserController/Create
         public ActionResult Create()
         {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            //Muestra la vista de inicio de sesión
+            return View("/Views/Login/Login.cshtml");
+        }
+
+        [HttpPost]
+        public IActionResult Login(IFormCollection collection)
+        {
+            //Si las credenciales son correctas iniciará sesión
+            //Si encuentra 
+            if (true)
+            {
+                //HttpContext.Session.SetString(SessionID, GetUser(collection["Username"], collection["Password"]));
+                HttpContext.Session.SetString(SessionID, collection["Username"]);
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            //Muestra la vista de registro
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(IFormCollection collection)
+        {
+            //Si las credenciales son correctas y no existe el usuario crea el usuario
             return View();
         }
 
