@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="API_DataTransfer\API_DataTransfer.csproj" />
     <ProjectReference Include="DataStructures\DataStructures.csproj" />
   </ItemGroup>
 

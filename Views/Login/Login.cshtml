@@ -1,17 +1,17 @@
-﻿<div class="container justify-content-center align-content-center">
+﻿<div class="container text-center pt-5 justify-content-center">
     <h2>Inicio de sesión</h2>
-    <form asp-action="Login">
-        <div class="input-group mb-3">
+    <form asp-action="Login" class="pt-3 col-4 offset-4">
+        <div class="row">
             <span class="input-group-text" id="basic-addon1">Usuario</span>
             <input type="text" name="User" class="form-control" aria-label="Usuario" aria-describedby="basic-addon1" required>
         </div>
-        <div class="input-group mb-3">
+        <div class="row">
             <span class="input-group-text" id="basic-addon2">Contraseña</span>
             <input type="password" name="Password" class="form-control" aria-label="Contraseña" aria-describedby="basic-addon2" required>
         </div>
-        <div class="d-grid gap-2">
-            <button class="btn btn-primary" type="submit">Iniciar sesión</button>
-            <a class="btn btn-success" asp-action="Register">Registrarse</a>
+        <div class="row">
+            <button class="col-6 btn-principal" type="submit">Iniciar sesión</button>
+            <a class="col-6 btn-principal" asp-action="Register">Registrarse</a>
         </div>
     </form>
 </div>

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace P1_EDDll_AFPE_DAVH
 {
@@ -16,6 +17,8 @@ namespace P1_EDDll_AFPE_DAVH
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            Starter.Starter api = new Starter.Starter();
+            HttpClient Client = api.Start();
         }
 
         public IConfiguration Configuration { get; }
@@ -51,7 +54,7 @@ namespace P1_EDDll_AFPE_DAVH
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=User}/{action=Login}");
                 endpoints.MapHub<ChatHub>("/chat");
             });
         }
