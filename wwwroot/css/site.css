@@ -5,6 +5,7 @@ for details on configuring this project to bundle and minify static web assets. 
     --principal: #282828;
     --secundario: #DDDDDD;
     --blanco: #FFFFFF;
+    --negro: #000000;
 }
 
 a.navbar-brand {
@@ -40,6 +41,17 @@ a {
     margin: 10px 5px;
     width: 48%;
     color: var(--blanco);
+}
+
+.btn-claro {
+    font-variant-caps: titling-caps;
+    font-size: 15px;
+    padding: 15px;
+    background-color: var(--blanco);
+    border-radius: 10px;
+    border: 0px;
+    margin: 10px 5px;
+    color: var(--principal);
 }
 
 .input-label {
