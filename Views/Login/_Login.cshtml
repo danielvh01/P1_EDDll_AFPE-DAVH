@@ -2,7 +2,7 @@
 
 <div class="container text-center pt-5 justify-content-center">
     <h2>Inicio de sesión</h2>
-    <form asp-action="Login" asp-controller="User" class="pt-3 col-6 offset-3">
+    <form asp-action="_Login" asp-controller="User" class="pt-3 col-6 offset-3">
         <div asp-validation-summary="ModelOnly"></div>
         <div class="row">
             <label class="input-label" asp-for="Username">Usuario</label>
@@ -20,6 +20,7 @@
         </div>
     </form>
 </div>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

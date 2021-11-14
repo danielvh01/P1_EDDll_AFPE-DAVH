@@ -52,7 +52,7 @@ namespace P1_EDDll_AFPE_DAVH
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=User}/{action=Login}");
+                    pattern: "{controller=User}/{action=_Login}");
                 endpoints.MapHub<ChatHub>("/chat");
             });
         }
