@@ -28,6 +28,10 @@ namespace API_DataTransfer.Controllers
                 return BadRequest();
             }
             var FindUser = AllUsers.Find(x => x.Username == username);
+            if (FindUser == null)
+            {
+                return BadRequest();
+            }
             return Ok(JsonSerializer.Serialize(await usersDB.GetUserFromID(FindUser.Id.ToString())));
         }
 

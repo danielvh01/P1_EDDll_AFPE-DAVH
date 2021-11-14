@@ -41,27 +41,28 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult _Login()
         {
             //Muestra la vista de inicio de sesión
-            return View("/Views/Login/Login.cshtml", new Login());
+            return View("/Views/Login/_Login.cshtml", new Login());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(IFormCollection collection) 
+        public async Task<ActionResult> _Login(IFormCollection collection) 
         { 
             //Si las credenciales son correctas iniciará sesión
             var user = new API_DataTransfer.Models.User();
             Starter.Starter api = new Starter.Starter();
             Client = api.Start();
-            HttpResponseMessage RM = await Client.GetAsync("api/user/" + collection["Username"]);
+            string username = collection["Username"];
+            HttpResponseMessage RM = await Client.GetAsync("api/user/" + username);
             //Si encuentra 
             if (RM.IsSuccessStatusCode)
             {
                 var request = RM.Content.ReadAsStringAsync().Result;
                 User currentUser = JsonSerializer.Deserialize<User>(request);
-                HttpContext.Session.SetString(SessionID, collection["Username"]);
+                //HttpContext.Session.SetString(SessionID, username);
             }
             return View();
         }
