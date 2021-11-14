@@ -1,0 +1,25 @@
+﻿@model P1_EDDll_AFPE_DAVH.Models.Login 
+
+<div class="container text-center pt-5 justify-content-center">
+    <h2>Inicio de sesión</h2>
+    <form asp-action="Login" asp-controller="User" class="pt-3 col-6 offset-3">
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="row">
+            <label class="input-label" asp-for="Username">Usuario</label>
+            <input asp-for="Username" class="input-text" required>
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+        <div class="row">
+            <label class="input-label" asp-for="Password">Contraseña</label>
+            <input type="password" asp-for="Password" class="input-text" required>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="row">
+            <a class="btn-principal" asp-action="Register">Registrarse</a>
+            <input class="btn-principal" type="submit" value="Iniciar sesión"/>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

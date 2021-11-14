@@ -1,6 +1,13 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+:root {
+    --principal: #282828;
+    --secundario: #DDDDDD;
+    --blanco: #FFFFFF;
+    --negro: #000000;
+}
+
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -22,6 +29,59 @@ a {
   color: #fff;
   background-color: #1b6ec2;
   border-color: #1861ac;
+}
+
+.btn-principal {
+    font-variant-caps: titling-caps;
+    font-size: 15px;
+    padding: 15px; 
+    background-color: var(--principal);
+    border-radius: 10px;
+    border: 0px;
+    margin: 10px 5px;
+    width: 48%;
+    color: var(--blanco);
+}
+
+.btn-claro {
+    font-variant-caps: titling-caps;
+    font-size: 15px;
+    padding: 15px;
+    background-color: var(--blanco);
+    border-radius: 10px;
+    border: 0px;
+    margin: 10px 5px;
+    color: var(--principal);
+}
+
+.input-label {
+    font-variant-caps: titling-caps;
+    width: 20%;
+    font-size: 15px;
+    padding: 15px;
+    border-radius: 10px 0px 0px 10px;
+    border: 0px;
+    margin: 10px 0px 10px 0px;
+    background-color: var(--secundario);
+    color: var(--principal);
+    text-wrap: avoid;
+}
+
+a.btn-principal:hover {
+    color: var(--blanco);
+    text-decoration: none;
+}
+
+.input-text {
+    font-variant-caps: titling-caps;
+    width: 80%;
+    border-radius: 0px 10px 10px 0px;
+    border: 1px var(--secundario) solid;
+    margin: 10px 0px 10px 0px;
+    background-color: var(--blanco);
+    color: var(--principal);
+    font-size: 15px;
+    padding: 15px;
 }
 
 /* Sticky footer styles
@@ -50,6 +110,9 @@ button.accept-policy {
   font-size: 1rem;
   line-height: inherit;
 }
+
+.formgroup 
+
 
 /* Sticky footer styles
 -------------------------------------------------- */

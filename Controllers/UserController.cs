@@ -10,14 +10,18 @@ using System.Text;
 using MongoDB.Driver;
 using P1_EDDll_AFPE_DAVH.Starter;
 using API_DataTransfer.Data;
+using P1_EDDll_AFPE_DAVH.Models;
+using System.Text.Json;
 
 
 namespace P1_EDDll_AFPE_DAVH.Controllers
 {
     public class UserController : Controller
     {
-        User_Collection db = new User_Collection();
-        Starter.Starter api = new Starter.Starter();
+        const string SessionID = "_UID";
+
+        HttpClient Client;
+
         // GET: UserController
         public ActionResult Index()
         {
@@ -33,6 +37,46 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         // GET: UserController/Create
         public ActionResult Create()
         {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            //Muestra la vista de inicio de sesión
+            return View("/Views/Login/Login.cshtml", new Login());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(IFormCollection collection) 
+        { 
+            //Si las credenciales son correctas iniciará sesión
+            var user = new API_DataTransfer.Models.User();
+            Starter.Starter api = new Starter.Starter();
+            Client = api.Start();
+            HttpResponseMessage RM = await Client.GetAsync("api/user/" + collection["Username"]);
+            //Si encuentra 
+            if (RM.IsSuccessStatusCode)
+            {
+                var request = RM.Content.ReadAsStringAsync().Result;
+                User currentUser = JsonSerializer.Deserialize<User>(request);
+                HttpContext.Session.SetString(SessionID, collection["Username"]);
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            //Muestra la vista de registro
+            return View("/Views/Login/Register.cshtml", new Register());
+        }
+
+        [HttpPost]
+        public IActionResult Register(IFormCollection collection)
+        {
+            //Si las credenciales son correctas y no existe el usuario crea el usuario
             return View();
         }
 

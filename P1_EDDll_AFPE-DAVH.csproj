@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -7,18 +7,28 @@
 
   <ItemGroup>
     <Compile Remove="API_DataTransfer\**" />
+    <Compile Remove="DataStructures\**" />
     <Content Remove="API_DataTransfer\**" />
+    <Content Remove="DataStructures\**" />
     <EmbeddedResource Remove="API_DataTransfer\**" />
+    <EmbeddedResource Remove="DataStructures\**" />
     <None Remove="API_DataTransfer\**" />
+    <None Remove="DataStructures\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.13.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="API_DataTransfer\API_DataTransfer.csproj" />
+    <ProjectReference Include="DataStructures\DataStructures.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Menu\" />
   </ItemGroup>
 
 </Project>
