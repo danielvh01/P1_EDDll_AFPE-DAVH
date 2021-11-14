@@ -17,19 +17,24 @@ namespace API_DataTransfer.Controllers
     public class UserController : ControllerBase
     {
         User_Collection usersDB = new User_Collection();
-        
-        
+
+
         [HttpGet("{username}")]
-        public async Task<IActionResult> GetSpecifiedUser(string user)
+        public async Task<IActionResult> GetSpecifiedUser([FromRoute] string username)
         {
             List<User> AllUsers = usersDB.GetAllUsers().Result.ToList();
-            var FindUser = AllUsers.Find(x => x.Username == user);            
+            if (AllUsers.Count == 0)
+            {
+                return BadRequest();
+            }
+            var FindUser = AllUsers.Find(x => x.Username == username);
             return Ok(JsonSerializer.Serialize(await usersDB.GetUserFromID(FindUser.Id.ToString())));
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddUser(JsonElement Juser)
+        public async Task<IActionResult> AddUser([FromBody] JsonElement Juser)
         {
+
             User _user = JsonSerializer.Deserialize<User>(Juser.ToString());
             List<User> UserRegistry = usersDB.GetAllUsers().Result.ToList();
             //Verify if the username exists
@@ -60,14 +65,15 @@ namespace API_DataTransfer.Controllers
             return BadRequest();
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateUser([FromBody] JsonElement Juser)
+        [HttpPut("{ID}")]
+        public async Task<IActionResult> UpdateUser([FromRoute]string id, [FromBody] JsonElement Juser)
         {
             User _user = JsonSerializer.Deserialize<User>(Juser.ToString());
             if (_user == null)
             {
                 return BadRequest();
             }
+            _user.Id = new MongoDB.Bson.ObjectId(id);            
             await usersDB.PutUser(_user);
             return Ok();
         }
