@@ -1,17 +1,29 @@
-﻿<div class="container justify-content-center align-content-center">
-    <h2>Registro</h2>
-    <form asp-action="Register">
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="basic-addon1">Usuario</span>
-            <input type="text" name="User" class="form-control" aria-label="Usuario" aria-describedby="basic-addon1" required>
+﻿@model P1_EDDll_AFPE_DAVH.Models.Register
+<div class="container text-center pt-5 justify-content-center">
+    <h2>Registro de usuario</h2>
+    <form asp-action="Register" asp-controller="User" class="pt-3 col-6 offset-3">
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="row">
+            <label class="input-label" asp-for="Username">Usuario</label>
+            <input asp-for="Username" class="input-text" required>
+            <span asp-validation-for="Username" class="text-danger"></span>
         </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="basic-addon2">Contraseña</span>
-            <input type="password" name="Password" class="form-control" aria-label="Contraseña" aria-describedby="basic-addon2" required>
+        <div class="row">
+            <label class="input-label" asp-for="Password">Contraseña</label>
+            <input type="password" asp-for="Password" class="input-text" required>
+            <span asp-validation-for="Password" class="text-danger"></span>
         </div>
-        <div class="d-grid gap-2">
-            <button class="btn btn-success" type="submit">Crear usuario</button>
-            <a class="btn btn-primary" asp-action="Login">Iniciar Sesión</a>
+        <div class="row">
+            <label class="input-label" asp-for="PasswordConfirm">Confirmar Contraseña</label>
+            <input type="password" asp-for="PasswordConfirm" class="input-text" required>
+            <span asp-validation-for="PasswordConfirm" class="text-danger"></span>
+        </div>
+        <div class="row">
+            <input class="btn-principal" type="submit" value="Registrarme" />
+            <a class="btn-principal" asp-action="Register">Ya tengo cuenta</a>
         </div>
     </form>
 </div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

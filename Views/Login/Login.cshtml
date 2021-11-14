@@ -1,17 +1,25 @@
-﻿<div class="container text-center pt-5 justify-content-center">
+﻿@model P1_EDDll_AFPE_DAVH.Models.Login 
+
+<div class="container text-center pt-5 justify-content-center">
     <h2>Inicio de sesión</h2>
-    <form asp-action="Login" class="pt-3 col-4 offset-4">
+    <form asp-action="Login" asp-controller="User" class="pt-3 col-6 offset-3">
+        <div asp-validation-summary="ModelOnly"></div>
         <div class="row">
-            <span class="input-group-text" id="basic-addon1">Usuario</span>
-            <input type="text" name="User" class="form-control" aria-label="Usuario" aria-describedby="basic-addon1" required>
+            <label class="input-label" asp-for="Username">Usuario</label>
+            <input asp-for="Username" class="input-text" required>
+            <span asp-validation-for="Username" class="text-danger"></span>
         </div>
         <div class="row">
-            <span class="input-group-text" id="basic-addon2">Contraseña</span>
-            <input type="password" name="Password" class="form-control" aria-label="Contraseña" aria-describedby="basic-addon2" required>
+            <label class="input-label" asp-for="Password">Contraseña</label>
+            <input type="password" asp-for="Password" class="input-text" required>
+            <span asp-validation-for="Password" class="text-danger"></span>
         </div>
         <div class="row">
-            <button class="col-6 btn-principal" type="submit">Iniciar sesión</button>
-            <a class="col-6 btn-principal" asp-action="Register">Registrarse</a>
+            <a class="btn-principal" asp-action="Register">Registrarse</a>
+            <input class="btn-principal" type="submit" value="Iniciar sesión"/>
         </div>
     </form>
 </div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

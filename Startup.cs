@@ -17,8 +17,6 @@ namespace P1_EDDll_AFPE_DAVH
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            Starter.Starter api = new Starter.Starter();
-            HttpClient Client = api.Start();
         }
 
         public IConfiguration Configuration { get; }

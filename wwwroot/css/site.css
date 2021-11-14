@@ -1,6 +1,12 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+:root {
+    --principal: #282828;
+    --secundario: #DDDDDD;
+    --blanco: #FFFFFF;
+}
+
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -26,11 +32,44 @@ a {
 
 .btn-principal {
     font-variant-caps: titling-caps;
-    color: white;
-    background-color: black;
-    border-radius: 5px;
+    font-size: 15px;
+    padding: 15px; 
+    background-color: var(--principal);
+    border-radius: 10px;
     border: 0px;
-    margin: 5px;
+    margin: 10px 5px;
+    width: 48%;
+    color: var(--blanco);
+}
+
+.input-label {
+    font-variant-caps: titling-caps;
+    width: 20%;
+    font-size: 15px;
+    padding: 15px;
+    border-radius: 10px 0px 0px 10px;
+    border: 0px;
+    margin: 10px 0px 10px 0px;
+    background-color: var(--secundario);
+    color: var(--principal);
+    text-wrap: avoid;
+}
+
+a.btn-principal:hover {
+    color: var(--blanco);
+    text-decoration: none;
+}
+
+.input-text {
+    font-variant-caps: titling-caps;
+    width: 80%;
+    border-radius: 0px 10px 10px 0px;
+    border: 1px var(--secundario) solid;
+    margin: 10px 0px 10px 0px;
+    background-color: var(--blanco);
+    color: var(--principal);
+    font-size: 15px;
+    padding: 15px;
 }
 
 /* Sticky footer styles
