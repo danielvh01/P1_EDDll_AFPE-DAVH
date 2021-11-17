@@ -1,22 +1,18 @@
-﻿@model int
-
-<h1>@P1_EDDll_AFPE_DAVH.Controllers.ChatController.Rooms.GetValueOrDefault(Model)</h1>
-
-<div class="row">
-    <div class="col-12">
-        <input type="text" placeholder="user" id="user" />
-        <input type="text" placeholder="text" id="message" />
-        <button id="btnSend">Send</button>
-    </div>
+﻿@model List<P1_EDDll_AFPE_DAVH.Models.Message>;
+<nav class="navigation-bar row">
+    <h2 class="text-white col-11 ml-3 p-0 m-0">@ViewBag.Chatname</h2>
+    <a class="btn-claro my-0">Regresar</a>
+</nav>
+<div class="mensajes">
+    @foreach (var message in Model)
+    {
+        <div ng-class="{ @ViewBag.UserID == @message.Id}"></div>
+    }
 </div>
-
-<div class="row">
-    <div class="col-6">
-        <div id="messages"></div>
-    </div>
-    <div class="col-6">
-        <div id="notifications"></div>
-    </div>
+<div class="footer-emisor row">
+    <button class="col-1 icon-btn"></button>
+    <input class="col-10 input-messagge" type="text" placeholder="Escribe aquí tu mensaje"/>
+    <button class="col-1 icon-btn"></button>
 </div>
 
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>

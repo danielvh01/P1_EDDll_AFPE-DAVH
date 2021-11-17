@@ -7,18 +7,15 @@ namespace P1_EDDll_AFPE_DAVH.Models
 {
     public class ChatRoom
     {
-        List<Message> Messages  { get; set; }
-        List<string> Users { get; set; }
-        public int type { get; set; }
+        List<Message> Messages  { get; }
+        List<byte[]> Users { get; }
+        public int type { get; }
 
-        public string name { get; set; }
-
-        public ChatRoom(List<Message> _Messages, List<string> _Users, int _type, string _name)
+        public ChatRoom(List<Message> _Messages, List<byte[]> _Users, int _type)
         {
             Messages = _Messages;
             Users = _Users;
             type = _type;
-            name = _name;
         }
     }
 }

@@ -19,20 +19,20 @@ namespace API_DataTransfer.Controllers
         User_Collection usersDB = new User_Collection();
 
 
-        [HttpGet("{username}")]
-        public async Task<IActionResult> GetSpecifiedUser([FromRoute] string username)
+        [HttpGet("{ID}")]
+        public async Task<IActionResult> GetSpecifiedUser([FromRoute] string ID)
         {
             List<User> AllUsers = usersDB.GetAllUsers().Result.ToList();
             if (AllUsers.Count == 0)
             {
                 return BadRequest();
             }
-            var FindUser = AllUsers.Find(x => x.Username == username);
+            var FindUser = AllUsers.Find(x => x.Id.ToString() == ID);
             if (FindUser == null)
             {
                 return BadRequest();
             }
-            return Ok(JsonSerializer.Serialize(await usersDB.GetUserFromID(FindUser.Id.ToString())));
+            return Ok(JsonSerializer.Serialize(FindUser));
         }
 
         [HttpPost]
@@ -56,14 +56,14 @@ namespace API_DataTransfer.Controllers
         public async Task<IActionResult> Login([FromBody] JsonElement Juser)
         {
             string JsonObj = Juser.ToString();
-            User user = JsonSerializer.Deserialize<User>(JsonObj);
+            Login user = JsonSerializer.Deserialize<Login>(JsonObj);
             List<User> UserRegistry = usersDB.GetAllUsers().Result.ToList();
             for (int i = 0; i < UserRegistry.Count; i++)
             {
                 if (UserRegistry.ElementAt(i).Username == user.Username && UserRegistry.ElementAt(i).Password == user.Password)
                 {
                     var FindUser = UserRegistry.Find(x => x.Username == user.Username);
-                    return Ok(JsonSerializer.Serialize(await usersDB.GetUserFromID(FindUser.Id.ToString())));
+                    return Ok(JsonSerializer.Serialize(FindUser.Id.ToString()));
                 }
             }
             return BadRequest();

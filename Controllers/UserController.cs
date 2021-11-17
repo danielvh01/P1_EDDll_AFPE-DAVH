@@ -12,13 +12,20 @@ using P1_EDDll_AFPE_DAVH.Starter;
 using API_DataTransfer.Data;
 using P1_EDDll_AFPE_DAVH.Models;
 using System.Text.Json;
-
+using Microsoft.AspNetCore.Hosting;
 
 namespace P1_EDDll_AFPE_DAVH.Controllers
 {
     public class UserController : Controller
     {
         const string SessionID = "_UID";
+        private readonly IHostingEnvironment hostingEnvironment;
+
+        public UserController(IHostingEnvironment hostingEnvironment)
+        {
+            this.hostingEnvironment = hostingEnvironment;
+        }
+
 
         HttpClient Client;
 
@@ -55,20 +62,25 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             var user = new API_DataTransfer.Models.User();
             Starter.Starter api = new Starter.Starter();
             Client = api.Start();
-            string username = collection["Username"];
-            HttpResponseMessage RM = await Client.GetAsync("api/user/" + username);
+            var credencials = new Login();
+            credencials.Username = collection["Username"];
+            credencials.Password = collection["Password"];
+            var json = JsonSerializer.Serialize(credencials);
+            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+            HttpResponseMessage RM = await Client.PostAsync("api/user/login",content);
             //Si encuentra 
             if (RM.IsSuccessStatusCode)
             {
                 var request = RM.Content.ReadAsStringAsync().Result;
-                User currentUser = JsonSerializer.Deserialize<User>(request);
-                //HttpContext.Session.SetString(SessionID, username);
+                var Id= JsonSerializer.Deserialize<string>(request);
+                HttpContext.Session.SetString(SessionID, Id);
+                return RedirectToAction(nameof(ListChat));
             }
             else
             {
                 TempData["testmsg"] = "Nombre de usuario o contraseña incorrectos.";
+                return View();
             }
-            return View();
         }
 
         [HttpGet]
@@ -85,39 +97,20 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             return View();
         }
 
-        // POST: UserController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
         // GET: UserController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> ListChat()
         {
-            return View();
-        }
-
-        // POST: UserController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
+            HttpResponseMessage RM = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
+            if(RM.IsSuccessStatusCode)
             {
-                return RedirectToAction(nameof(Index));
+                User currentuser = JsonSerializer.Deserialize<User>(RM.Content.ReadAsStringAsync().Result);
+                ViewBag.Username = currentuser.Username;
+                return View("/Views/Chat/ListaChats.cshtml", currentuser.Chats);
             }
-            catch
+            else
             {
-                return View();
+
             }
         }
 
