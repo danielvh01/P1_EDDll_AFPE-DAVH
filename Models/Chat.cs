@@ -7,8 +7,8 @@ namespace P1_EDDll_AFPE_DAVH.Models
 {
     public class Chat
     {
-        string ID;
-        string name;
+        public string ID { get; set; }
+        public string name { get; set; }
 
         public Chat(string _ID, string _name)
         {

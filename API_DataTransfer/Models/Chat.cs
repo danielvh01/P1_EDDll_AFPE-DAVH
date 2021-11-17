@@ -3,19 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace P1_EDDll_AFPE_DAVH.Models
+namespace API_DataTransfer.Models
 {
-    public class ChatRoom
+    public class Chat
     {
-        List<Message> Messages  { get; }
-        List<byte[]> Users { get; }
-        public int type { get; }
+        public string ID { get; set; }
+        public string name { get; set; }
 
-        public ChatRoom(List<Message> _Messages, List<byte[]> _Users, int _type)
+        public Chat(string _ID, string _name)
         {
-            Messages = _Messages;
-            Users = _Users;
-            type = _type;
+            ID = _ID;
+            name = _name;
         }
     }
 }

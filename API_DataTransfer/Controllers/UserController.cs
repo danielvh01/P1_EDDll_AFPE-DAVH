@@ -39,7 +39,7 @@ namespace API_DataTransfer.Controllers
         public async Task<IActionResult> AddUser([FromBody] JsonElement Juser)
         {
 
-            User _user = JsonSerializer.Deserialize<User>(Juser.ToString());
+            Login _user = JsonSerializer.Deserialize<Login>(Juser.ToString());
             List<User> UserRegistry = usersDB.GetAllUsers().Result.ToList();
             //Verify if the username exists
             for (int i = 0; i < UserRegistry.Count; i++)
@@ -48,8 +48,12 @@ namespace API_DataTransfer.Controllers
                     return BadRequest();
 
             }
-            await usersDB.AddUsers(_user);
-            return Created("Created", true);
+            User newUser = new User();
+            newUser.Id = new MongoDB.Bson.ObjectId();
+            newUser.Username = _user.Username;
+            newUser.Password = _user.Password;
+            await usersDB.AddUsers(newUser);
+            return Created("Created", JsonSerializer.Serialize(newUser.Id.ToString()));
         }
 
         [HttpPost("login")]
