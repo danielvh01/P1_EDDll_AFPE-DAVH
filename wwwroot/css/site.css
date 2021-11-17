@@ -43,6 +43,20 @@ a {
     color: var(--blanco);
 }
 
+.chat-item {
+    color: var(--negro);
+    padding: 25px;
+    margin: 0px !important;
+    border-bottom: 1px solid var(--secundario);
+    width: 100%;
+    font-size: 20px;
+}
+
+.chat-item:hover {
+    color: var(--negro);
+    text-decoration: none;
+}
+
 .btn-claro {
     font-variant-caps: titling-caps;
     font-size: 15px;
@@ -52,6 +66,13 @@ a {
     border: 0px;
     margin: 10px 5px;
     color: var(--principal);
+}
+
+.navigation-bar {
+    background-color: var(--principal);
+    margin: 0px;
+    border: 0px;
+    padding: 15px;
 }
 
 .input-label {

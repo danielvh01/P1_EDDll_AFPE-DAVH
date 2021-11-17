@@ -12,14 +12,23 @@ using P1_EDDll_AFPE_DAVH.Starter;
 using API_DataTransfer.Data;
 using P1_EDDll_AFPE_DAVH.Models;
 using System.Text.Json;
-
+using Microsoft.AspNetCore.Hosting;
 
 namespace P1_EDDll_AFPE_DAVH.Controllers
 {
     public class UserController : Controller
     {
         const string SessionID = "_UID";
+        private readonly IHostingEnvironment hostingEnvironment;
 
+        public UserController(IHostingEnvironment hostingEnvironment)
+        {
+            this.hostingEnvironment = hostingEnvironment;
+            api = new Starter.Starter();
+            Client = api.Start();
+        }
+
+        Starter.Starter api;
         HttpClient Client;
 
         // GET: UserController
@@ -50,75 +59,76 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> _Login(IFormCollection collection) 
-        { 
+        {
             //Si las credenciales son correctas iniciará sesión
-            var user = new API_DataTransfer.Models.User();
-            Starter.Starter api = new Starter.Starter();
-            Client = api.Start();
-            string username = collection["Username"];
-            HttpResponseMessage RM = await Client.GetAsync("api/user/" + username);
+            var credencials = new Login();
+            credencials.Username = collection["Username"];
+            credencials.Password = collection["Password"];
+            var json = JsonSerializer.Serialize(credencials);
+            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+            HttpResponseMessage RM = await Client.PostAsync("api/user/login",content);
             //Si encuentra 
             if (RM.IsSuccessStatusCode)
             {
                 var request = RM.Content.ReadAsStringAsync().Result;
-                User currentUser = JsonSerializer.Deserialize<User>(request);
-                //HttpContext.Session.SetString(SessionID, username);
+                var Id= JsonSerializer.Deserialize<string>(request);
+                HttpContext.Session.SetString(SessionID, Id);
+                return RedirectToAction(nameof(ListChat));
             }
             else
             {
                 TempData["testmsg"] = "Nombre de usuario o contraseña incorrectos.";
+                return View("/Views/Login/_Login.cshtml", new Login());
             }
-            return View();
         }
 
         [HttpGet]
-        public IActionResult Register()
+        public IActionResult _Register()
         {
             //Muestra la vista de registro
-            return View("/Views/Login/Register.cshtml", new Register());
+            return View("/Views/Login/_Registro.cshtml", new Register());
         }
 
         [HttpPost]
-        public IActionResult Register(IFormCollection collection)
+        public async Task<IActionResult> _Register(IFormCollection collection)
         {
             //Si las credenciales son correctas y no existe el usuario crea el usuario
-            return View();
+            if(collection["Password"] == collection["PasswordConfirm"])
+            {
+                var credencials = new Login();
+                credencials.Username = collection["Username"];
+                credencials.Password = collection["Password"];
+                var json = JsonSerializer.Serialize(credencials);
+                var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+                HttpResponseMessage RM = await Client.PostAsync("api/user/", content);
+                if (RM.IsSuccessStatusCode)
+                {
+                    var request = RM.Content.ReadAsStringAsync().Result;
+                    var Id = JsonSerializer.Deserialize<string>(request);
+                    HttpContext.Session.SetString(SessionID, Id);
+                    return RedirectToAction(nameof(ListChat));
+                }
+                else
+                {
+                    TempData["testmsg"] = "El nombre de usuario ya ha sido utilizado, por favor escoja otro.";
+                    return View("/Views/Login/_Registro.cshtml", new Register());
+                }
+            }
+            else
+            {
+                TempData["testmsg"] = "Las contraseñas no coinciden.";
+                return View("/Views/Login/_Registro.cshtml", new Register());
+            }
         }
 
-        // POST: UserController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
         // GET: UserController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> ListChat()
         {
-            return View();
-        }
-
-        // POST: UserController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            HttpResponseMessage RM = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
+            User currentuser = JsonSerializer.Deserialize<User>(RM.Content.ReadAsStringAsync().Result);
+            ViewBag.Username = currentuser.Username;
+            return View("/Views/Chat/ListaChats.cshtml", currentuser.Chats);
         }
 
         // GET: UserController/Delete/5

@@ -24,6 +24,9 @@ namespace P1_EDDll_AFPE_DAVH
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSession(options => {
+                options.IdleTimeout = TimeSpan.FromMinutes(15);//You can set Time   
+            });
             services.AddControllersWithViews();
             services.AddSignalR();
         }
@@ -45,6 +48,8 @@ namespace P1_EDDll_AFPE_DAVH
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseSession();
 
             app.UseAuthorization();
 

@@ -1,0 +1,15 @@
+﻿@model List<P1_EDDll_AFPE_DAVH.Models.Chat>
+<nav class="navigation-bar row">
+    <h2 class="text-white col-9 ml-3 p-0 m-0">Ha iniciado sesión como: @ViewBag.Username</h2>
+    <a class="btn-claro my-0">Nuevo Chat</a>
+    <a class="btn-claro my-0">Contactos</a>
+    <a class="btn-claro my-0">Cerrar sesión</a>
+</nav>
+<div class="row">
+    <div class="col-12">
+        @foreach (var e in Model)
+        {
+            <a class="pl-4 chat-item row" href="~/Chat/Room?room=@e.ID">@e.name</a>
+        }
+    </div>
+</div>

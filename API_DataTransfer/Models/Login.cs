@@ -9,11 +9,9 @@ namespace API_DataTransfer.Models
 {
     public class Login
     {
-        [BsonId]
-        public ObjectId Id { get;}
 
-        public string Username { get;}
-        public string Password { get; }
+        public string Username { get; set; }
+        public string Password { get; set; }
 
         public Login()
         {

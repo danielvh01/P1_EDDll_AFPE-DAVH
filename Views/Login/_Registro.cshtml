@@ -1,7 +1,7 @@
 ﻿@model P1_EDDll_AFPE_DAVH.Models.Register
 <div class="container text-center pt-5 justify-content-center">
     <h2>Registro de usuario</h2>
-    <form asp-action="Register" asp-controller="User" class="pt-3 col-6 offset-3">
+    <form asp-action="_Register" asp-controller="User" class="pt-3 col-6 offset-3">
         <div asp-validation-summary="ModelOnly"></div>
         <div class="row">
             <label class="input-label" asp-for="Username">Usuario</label>
@@ -19,11 +19,18 @@
             <span asp-validation-for="PasswordConfirm" class="text-danger"></span>
         </div>
         <div class="row">
-            <input class="btn-principal" type="submit" value="Registrarme" />
             <a class="btn-principal" asp-action="Register">Ya tengo cuenta</a>
+            <input class="btn-principal" type="submit" value="Registrarme" />
         </div>
     </form>
 </div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+@if (TempData["testmsg"] != null)
+{
+    <script type="text/javascript">
+       alert("@TempData["testmsg"]");
+    </script>
 }

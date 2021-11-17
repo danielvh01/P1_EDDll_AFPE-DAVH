@@ -19,27 +19,27 @@ namespace API_DataTransfer.Controllers
         User_Collection usersDB = new User_Collection();
 
 
-        [HttpGet("{username}")]
-        public async Task<IActionResult> GetSpecifiedUser([FromRoute] string username)
+        [HttpGet("{ID}")]
+        public async Task<IActionResult> GetSpecifiedUser([FromRoute] string ID)
         {
             List<User> AllUsers = usersDB.GetAllUsers().Result.ToList();
             if (AllUsers.Count == 0)
             {
                 return BadRequest();
             }
-            var FindUser = AllUsers.Find(x => x.Username == username);
+            var FindUser = AllUsers.Find(x => x.Id.ToString() == ID);
             if (FindUser == null)
             {
                 return BadRequest();
             }
-            return Ok(JsonSerializer.Serialize(await usersDB.GetUserFromID(FindUser.Id.ToString())));
+            return Ok(JsonSerializer.Serialize(FindUser));
         }
 
         [HttpPost]
         public async Task<IActionResult> AddUser([FromBody] JsonElement Juser)
         {
 
-            User _user = JsonSerializer.Deserialize<User>(Juser.ToString());
+            Login _user = JsonSerializer.Deserialize<Login>(Juser.ToString());
             List<User> UserRegistry = usersDB.GetAllUsers().Result.ToList();
             //Verify if the username exists
             for (int i = 0; i < UserRegistry.Count; i++)
@@ -48,22 +48,26 @@ namespace API_DataTransfer.Controllers
                     return BadRequest();
 
             }
-            await usersDB.AddUsers(_user);
-            return Created("Created", true);
+            User newUser = new User();
+            newUser.Id = new MongoDB.Bson.ObjectId();
+            newUser.Username = _user.Username;
+            newUser.Password = _user.Password;
+            await usersDB.AddUsers(newUser);
+            return Created("Created", JsonSerializer.Serialize(newUser.Id.ToString()));
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] JsonElement Juser)
         {
             string JsonObj = Juser.ToString();
-            User user = JsonSerializer.Deserialize<User>(JsonObj);
+            Login user = JsonSerializer.Deserialize<Login>(JsonObj);
             List<User> UserRegistry = usersDB.GetAllUsers().Result.ToList();
             for (int i = 0; i < UserRegistry.Count; i++)
             {
                 if (UserRegistry.ElementAt(i).Username == user.Username && UserRegistry.ElementAt(i).Password == user.Password)
                 {
                     var FindUser = UserRegistry.Find(x => x.Username == user.Username);
-                    return Ok(JsonSerializer.Serialize(await usersDB.GetUserFromID(FindUser.Id.ToString())));
+                    return Ok(JsonSerializer.Serialize(FindUser.Id.ToString()));
                 }
             }
             return BadRequest();
