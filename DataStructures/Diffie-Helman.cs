@@ -16,41 +16,14 @@ namespace DataStructures
 
         
 
-        public BigInteger D_H(int a)
+        public BigInteger D_H(int g, int p ,int a)
         {
-            Random rnd = new Random();
-
-            int valP = rnd.Next(2,100);
-            while (!IsPrime(valP))
-            {
-                valP = rnd.Next(2, 100);
-            }
-            int valG = rnd.Next(2, 100);
-            while (valG == valP)
-            {
-                valG = rnd.Next(2, 100);
-            }
-            
-            BigInteger A = BigInteger.ModPow(valG,a,valP);
-
-           // BigInteger secretKey1 = BigInteger.ModPow(B,a,valP);
-           // BigInteger secretKey2 = BigInteger.ModPow(B, a, valP);
-            return 0;
-
+            return BigInteger.ModPow(g, a, p);
         }
-        bool IsPrime(int number)
+
+        public BigInteger SecretCKey(int a,int B, int p)
         {
-            if (number <= 1) return false;
-            if (number == 2) return true;
-            if (number % 2 == 0) return false;
-
-            var boundary = (int)Math.Floor(Math.Sqrt(number));
-
-            for (int i = 3; i <= boundary; i += 2)
-                if (number % i == 0)
-                    return false;
-
-            return true;
+            return BigInteger.ModPow(B, a, p);
         }
 
     }
