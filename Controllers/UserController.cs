@@ -64,6 +64,10 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                 User currentUser = JsonSerializer.Deserialize<User>(request);
                 //HttpContext.Session.SetString(SessionID, username);
             }
+            else
+            {
+                TempData["testmsg"] = "Nombre de usuario o contraseña incorrectos.";
+            }
             return View();
         }
 
