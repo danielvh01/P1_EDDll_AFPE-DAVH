@@ -33,9 +33,11 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         HttpClient Client;
 
         // GET: UserController
-        public ActionResult Index()
+        public ActionResult LogOut()
         {
-            return View();
+            HttpContext.Session.Remove(SessionID);
+            HttpContext.Session.Remove(SessionUsername);
+            return View("/Views/Login/_Login.cshtml", new Login());
         }
 
         // GET: UserController/Details/5
@@ -51,7 +53,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             var response = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
             var user = response.Content.ReadAsStringAsync().Result;
             User currentUser = JsonSerializer.Deserialize<User>(user);
-            return View("/Views/Chat/Contactos.cshtml", User);
+            return View("/Views/Chat/Contactos.cshtml", currentUser);
         }
 
         [HttpGet]
@@ -63,7 +65,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> _Login(IFormCollection collection) 
+        public async Task<ActionResult> _Login(IFormCollection collection)
         {
             //Si las credenciales son correctas iniciará sesión
             var credencials = new Login();
@@ -71,19 +73,19 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             credencials.Password = collection["Password"];
             var json = JsonSerializer.Serialize(credencials);
             var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            HttpResponseMessage RM = await Client.PostAsync("api/user/login",content);
+            HttpResponseMessage RM = await Client.PostAsync("api/user/login", content);
             //Si encuentra 
             if (RM.IsSuccessStatusCode)
             {
                 var request = RM.Content.ReadAsStringAsync().Result;
-                var Id= JsonSerializer.Deserialize<string>(request);
+                var Id = JsonSerializer.Deserialize<string>(request);
                 HttpContext.Session.SetString(SessionID, Id);
                 HttpContext.Session.SetString(SessionUsername, credencials.Username);
                 return RedirectToAction(nameof(ListChat));
             }
             else
             {
-                TempData["testmsg"] = "Nombre de usuario o contraseña incorrectos.";
+                TempData["testmsg"] = "Nombre de usuario o contrasena incorrectos.";
                 return View("/Views/Login/_Login.cshtml", new Login());
             }
         }
@@ -99,7 +101,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         public async Task<IActionResult> _Register(IFormCollection collection)
         {
             //Si las credenciales son correctas y no existe el usuario crea el usuario
-            if(collection["Password"] == collection["PasswordConfirm"])
+            if (collection["Password"] == collection["PasswordConfirm"])
             {
                 var credencials = new Login();
                 credencials.Username = collection["Username"];
@@ -122,7 +124,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             }
             else
             {
-                TempData["testmsg"] = "Las contraseñas no coinciden.";
+                TempData["testmsg"] = "Las contrasenas no coinciden.";
                 return View("/Views/Login/_Registro.cshtml", new Register());
             }
         }
@@ -138,23 +140,83 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         }
 
         // GET: UserController/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult newContact()
         {
-            return View();
+            return View("/Views/Chat/newContact.cshtml");
         }
 
         // POST: UserController/Delete/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> newContact(IFormCollection collection)
         {
-            try
+            HttpResponseMessage RM = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
+
+            HttpResponseMessage RM2 = await Client.GetAsync("api/user/getByUser/" + collection["Username"]);
+
+            if (RM.IsSuccessStatusCode && RM2.IsSuccessStatusCode)
             {
-                return RedirectToAction(nameof(Index));
+                User currentUser = JsonSerializer.Deserialize<User>(RM.Content.ReadAsStringAsync().Result);
+                string ID = JsonSerializer.Deserialize<string>(RM2.Content.ReadAsStringAsync().Result);
+                HttpResponseMessage RM3 = await Client.GetAsync("api/user/" + ID);
+                User User = JsonSerializer.Deserialize<User>(RM3.Content.ReadAsStringAsync().Result);
+                if (currentUser.Contacts.Find(x => x == User.Username) == null)
+                {
+                    if (User.ConnectionRequests.Find(x => x == HttpContext.Session.GetString(SessionID)) == null)
+                    {
+                        if (currentUser.ConnectionRequests.Find(x => x == User.Username) == null)
+                        {
+                            await Client.PutAsync("api/user/addContact/" + HttpContext.Session.GetString(SessionID) + "/" + ID, null);
+                            
+                            return RedirectToAction(nameof(Contacts));
+                            
+                        }
+                        else
+                        {
+                            TempData["testmsg"] = "Tiene una solicitud pendiente de este usuario";
+                            return View("/Views/Chat/newContact.cshtml");
+                        }
+                    }
+                    else
+                    {
+                        TempData["testmsg"] = "Ya tiene una solicitud pendiente";
+                        return View("/Views/Chat/newContact.cshtml");
+                    }
+                }
+                else
+                {
+                    TempData["testmsg"] = "Este usuario ya esta en sus contactos";
+                    return View("/Views/Chat/newContact.cshtml");
+                }
             }
-            catch
+            else
             {
-                return View();
+                TempData["testmsg"] = "No se encontro el usuario";
+                return View("/Views/Chat/newContact.cshtml");
+            }
+        }
+
+        public async Task<IActionResult> AccceptRequest(string ID)
+        {
+            if(Client.PutAsync("api/user/accept/" + HttpContext.Session.GetString(SessionID) + "/" + ID, null).IsCompletedSuccessfully)
+            {
+                return View("/Views/Chat/newContact.cshtml");
+            }
+            else
+            {
+                TempData["testmsg"] = "No se pudo aceptar la solicitud";
+                return View("/Views/Chat/newContact.cshtml");
+            }
+        }
+        public async Task<IActionResult> DenegateRequest(string ID)
+        {
+            if (Client.PutAsync("api/user/reject/" + HttpContext.Session.GetString(SessionID) + "/" + ID, null).IsCompletedSuccessfully)
+            {
+                return View("/Views/Chat/newContact.cshtml");
+            }
+            else
+            {
+                TempData["testmsg"] = "No se pudo denegar la solicitud";
+                return View("/Views/Chat/newContact.cshtml");
             }
         }
     }

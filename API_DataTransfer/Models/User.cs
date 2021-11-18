@@ -24,7 +24,7 @@ namespace API_DataTransfer.Models
         public int e { get; set; }
         public User()
         {
-            
+            Id = ObjectId.GenerateNewId();
             Random rnd = new Random();
             Contacts = new List<string>();
             ConnectionRequests = new List<string>();
