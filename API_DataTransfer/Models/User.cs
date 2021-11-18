@@ -29,7 +29,7 @@ namespace API_DataTransfer.Models
             Contacts = new List<string>();
             ConnectionRequests = new List<string>();
             Chats = new List<Chat>();
-            a = rnd.Next(2);
+            a = rnd.Next(2,100);
 
             int p = rnd.Next(16);
             while (!IsPrime(p))

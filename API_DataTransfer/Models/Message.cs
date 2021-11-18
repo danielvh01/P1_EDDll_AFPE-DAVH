@@ -16,8 +16,8 @@ namespace API_DataTransfer.Models
         public bool visible  { get; set; }
         public byte[] content { get; set; }
         public int type { get; set; }
-
-        public string IdSender { get; set; }
+        public string title { get; set; }
+        public string UserSender { get; set; }
 
         //Keys for cipher 
         public int k1  { get; set; }
@@ -31,7 +31,7 @@ namespace API_DataTransfer.Models
             visible = true;
             content = _content;
             type = _type;
-            IdSender = _idSender;
+            UserSender = _idSender;
             k1 = _k1;
             k2 = _k2;
 

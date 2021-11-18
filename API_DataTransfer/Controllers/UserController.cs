@@ -17,17 +17,13 @@ namespace API_DataTransfer.Controllers
     public class UserController : ControllerBase
     {
         User_Collection usersDB = new User_Collection();
+        ChatRoom_Collection chatRoomDB = new ChatRoom_Collection();
 
 
         [HttpGet("{ID}")]
         public async Task<IActionResult> GetSpecifiedUser([FromRoute] string ID)
         {
-            List<User> AllUsers = usersDB.GetAllUsers().Result.ToList();
-            if (AllUsers.Count == 0)
-            {
-                return BadRequest();
-            }
-            var FindUser = AllUsers.Find(x => x.Id.ToString() == ID);
+            var FindUser = usersDB.GetUserFromID(ID);
             if (FindUser == null)
             {
                 return BadRequest();
@@ -74,16 +70,98 @@ namespace API_DataTransfer.Controllers
         }
 
         [HttpPut("{ID}")]
-        public async Task<IActionResult> UpdateUser([FromRoute]string id, [FromBody] JsonElement Juser)
+        public async Task<IActionResult> UpdateUser([FromRoute] string id, [FromBody] JsonElement Juser)
         {
             User _user = JsonSerializer.Deserialize<User>(Juser.ToString());
             if (_user == null)
             {
                 return BadRequest();
             }
-            _user.Id = new MongoDB.Bson.ObjectId(id);            
+            _user.Id = new MongoDB.Bson.ObjectId(id);
             await usersDB.PutUser(_user);
             return Ok();
         }
+
+        [HttpPut("{idSender}/{idReceiver}")]
+        public async Task<IActionResult> AddContact(string idSender, string idReceiver)
+        {
+            var _user = await usersDB.GetUserFromID(idReceiver);
+            if (_user == null)
+            {
+                return BadRequest();
+            }
+            _user.Id = new MongoDB.Bson.ObjectId(idReceiver);
+            _user.ConnectionRequests.Add(idSender);
+            await usersDB.PutUser(_user);
+            return Ok();
+        }
+
+        [HttpPut("accept/{idSender}/{idReceiver}")]
+        public async Task<IActionResult> AcceptRequest(string idSender, string idReceiver)
+        {
+            //Search the user that accepted the request
+            var _user = await usersDB.GetUserFromID(idReceiver);
+            if (_user == null)
+            {
+                return BadRequest();
+            }
+            _user.Id = new MongoDB.Bson.ObjectId(idReceiver);
+            //Remove the request from the request list
+            _user.ConnectionRequests.Remove(idSender);
+            //add to the contacts the user that sent the request
+            _user.Contacts.Add(idSender);
+            await usersDB.PutUser(_user);
+
+            //Search the user that sent the request
+            var _user2 = await usersDB.GetUserFromID(idSender);
+            if (_user2 == null)
+            {
+                return BadRequest();
+            }
+            _user2.Id = new MongoDB.Bson.ObjectId(idSender);
+            //Add to contacts the user that accepted the request
+            _user2.Contacts.Add(idReceiver);
+            await usersDB.PutUser(_user2);
+            return Ok();
+        }
+
+
+        [HttpPut("{ID}")]
+        public async Task<IActionResult> RejectRequest([FromRoute] string idSender, string idReceiver)
+        {
+            //Search the user that accepted the request
+            var _user = await usersDB.GetUserFromID(idReceiver);
+            if (_user == null)
+            {
+                return BadRequest();
+            }
+            _user.Id = new MongoDB.Bson.ObjectId(idReceiver);
+            //Remove the request from the request list
+            _user.ConnectionRequests.Remove(idSender);
+            await usersDB.PutUser(_user);
+            return Ok();
+        }
+
+        [HttpPost("createChat")]
+        public async Task<IActionResult> CreateChat([FromBody] JsonElement JChat)
+        {
+            ChatRoom _chat = JsonSerializer.Deserialize<ChatRoom>(JChat.ToString());
+            await chatRoomDB.AddChat(_chat);
+            return Created("Created", JsonSerializer.Serialize(_chat.Id.ToString()));
+        }
+
+        [HttpPut("chat/{ID}")]
+        public async Task<IActionResult> UpdateChat([FromRoute] string id, [FromBody] JsonElement JChat)
+        {
+            ChatRoom _chat = JsonSerializer.Deserialize<ChatRoom>(JChat.ToString());
+            if (_chat == null)
+            {
+                return BadRequest();
+            }
+            _chat.Id = new MongoDB.Bson.ObjectId(id);
+            await chatRoomDB.PutChatRoom(_chat);
+            return Ok();
+        }
+
     }
 }
