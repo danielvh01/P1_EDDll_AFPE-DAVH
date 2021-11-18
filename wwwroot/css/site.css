@@ -6,6 +6,8 @@ for details on configuring this project to bundle and minify static web assets. 
     --secundario: #DDDDDD;
     --blanco: #FFFFFF;
     --negro: #000000;
+    --text-gris: #666666;
+    --presionado: #D9D9D9;
 }
 
 a.navbar-brand {
@@ -31,16 +33,136 @@ a {
   border-color: #1861ac;
 }
 
+.footer-emisor {
+    background-color: var(--secundario);
+    padding: 15px;
+    margin: 0px !important;
+    border: 0px;
+    width: 100%;
+}
+
+.icon-btn {
+    color: var(--text-gris);
+    margin: 0px !important;
+    padding: 0px;
+    border: 0px;
+}
+
+.emisor-mensaje {
+    color: var(--principal);
+    margin: 0px !important;
+    padding: 0px;
+    border: 0px;
+}
+
+.text-message {
+    color: var(--principal);
+    margin: 0px !important;
+    padding: 0px;
+    border: 0px;
+}
+
+.titulo {
+    color: var(--principal);
+    margin: 0px !important;
+    padding: 0px;
+    border: 0px;
+}
+
+.icon-btn:hover {
+    color: var(--text-gris);
+    margin: 0px !important;
+    padding: 0px;
+    border: 1px solid var(--text-gris);
+    cursor: pointer;
+}
+.icon-btn:active {
+    color: var(--text-gris);
+    background-color: var(--presionado);
+    margin: 0px !important;
+    padding: 0px;
+    border: 1px solid var(--text-gris);
+    cursor: pointer;
+}
+
+.mensajes {
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    margin: 0px !important;
+    border: 0px;
+    background-color: var(--blanco);
+    overflow-y: scroll;
+    overflow-x: no-display;
+}
+
+.mensaje {
+    border-radius: 10px;
+    border: 1px var(--secundario) solid;
+    margin: 0px !important;
+    background-color: var(--blanco);
+    padding: 15px;
+}
+
+.mensaje-propio {
+    border-radius: 10px;
+    border: 1px var(--secundario) solid;
+    margin: 0px !important;
+    background-color: var(--text-gris);
+    padding: 15px;
+}
+
+.input-messagge {
+    border-radius: 10px;
+    border: 1px var(--secundario) solid;
+    margin: 0px !important;
+    background-color: var(--blanco);
+    color: var(--principal);
+    font-size: 15px;
+    padding: 15px;
+}
+
 .btn-principal {
     font-variant-caps: titling-caps;
     font-size: 15px;
-    padding: 15px; 
+    padding: 15px;
     background-color: var(--principal);
     border-radius: 10px;
     border: 0px;
     margin: 10px 5px;
     width: 48%;
     color: var(--blanco);
+}
+
+.btn-principal a {
+    font-variant-caps: titling-caps;
+    font-size: 15px;
+    padding: 15px;
+    background-color: var(--principal);
+    border-radius: 10px;
+    border: 0px;
+    margin: 0px !important;
+    width: 48%;
+    color: var(--blanco);
+}
+
+span.btn-principal {
+    padding: 0px;
+    border: 0px;
+    margin: 10px 5px;
+}
+
+.maxheight {
+    min-height: 585px;
+    margin: 0px !important;
+    padding: 0px;
+    border: 0px;
+}
+
+.titulo-lista {
+    margin: 0px !important;
+    padding: 0px;
+    border: 0px;
 }
 
 .chat-item {
@@ -50,6 +172,13 @@ a {
     border-bottom: 1px solid var(--secundario);
     width: 100%;
     font-size: 20px;
+}
+
+.list-contacts{
+    border-right: 1px var(--principal) solid;
+}
+.list-requests {
+    border-left: 1px var(--principal) solid;
 }
 
 .chat-item:hover {
@@ -66,6 +195,11 @@ a {
     border: 0px;
     margin: 10px 5px;
     color: var(--principal);
+}
+
+.btn-claro:hover {
+    color: var(--principal);
+    text-decoration:none;
 }
 
 .navigation-bar {
@@ -88,7 +222,26 @@ a {
     text-wrap: avoid;
 }
 
+.request {
+    padding: 25px;
+    margin: 0px !important;
+    width: 100%;
+    border-bottom: 1px solid var(--secundario);
+}
+
+.item {
+    color: var(--principal);
+    margin: 0px !important;
+    width: 100%;
+    font-size: 20px;
+}
+
 a.btn-principal:hover {
+    color: var(--blanco);
+    text-decoration: none;
+}
+
+.btn-principal a:hover {
     color: var(--blanco);
     text-decoration: none;
 }

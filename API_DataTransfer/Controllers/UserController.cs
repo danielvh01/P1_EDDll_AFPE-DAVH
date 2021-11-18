@@ -23,12 +23,24 @@ namespace API_DataTransfer.Controllers
         [HttpGet("{ID}")]
         public async Task<IActionResult> GetSpecifiedUser([FromRoute] string ID)
         {
-            var FindUser = usersDB.GetUserFromID(ID);
+            var FindUser = await usersDB.GetUserFromID(ID);
             if (FindUser == null)
             {
                 return BadRequest();
             }
+            FindUser.Id = new MongoDB.Bson.ObjectId(ID);
             return Ok(JsonSerializer.Serialize(FindUser));
+        }
+
+        [HttpGet("getByUser/{Username}")]
+        public async Task<IActionResult> GetByUser([FromRoute] string Username)
+        {
+            var FindUser = usersDB.GetAllUsers().Result.ToList().Find(x => x.Username == Username).Id;
+            if (FindUser == null)
+            {
+                return BadRequest();
+            }
+            return Ok(JsonSerializer.Serialize(FindUser.ToString()));
         }
 
         [HttpPost]
@@ -36,7 +48,7 @@ namespace API_DataTransfer.Controllers
         {
 
             Login _user = JsonSerializer.Deserialize<Login>(Juser.ToString());
-            List<User> UserRegistry = usersDB.GetAllUsers().Result.ToList();
+            List<User> UserRegistry = await usersDB.GetAllUsers();
             //Verify if the username exists
             for (int i = 0; i < UserRegistry.Count; i++)
             {
@@ -45,7 +57,6 @@ namespace API_DataTransfer.Controllers
 
             }
             User newUser = new User();
-            newUser.Id = new MongoDB.Bson.ObjectId();
             newUser.Username = _user.Username;
             newUser.Password = _user.Password;
             await usersDB.AddUsers(newUser);
@@ -82,7 +93,7 @@ namespace API_DataTransfer.Controllers
             return Ok();
         }
 
-        [HttpPut("{idSender}/{idReceiver}")]
+        [HttpPut("addContact/{idSender}/{idReceiver}")]
         public async Task<IActionResult> AddContact(string idSender, string idReceiver)
         {
             var _user = await usersDB.GetUserFromID(idReceiver);
@@ -126,7 +137,7 @@ namespace API_DataTransfer.Controllers
         }
 
 
-        [HttpPut("{ID}")]
+        [HttpPut("reject/{idSender}/{idReceiver}")]
         public async Task<IActionResult> RejectRequest([FromRoute] string idSender, string idReceiver)
         {
             //Search the user that accepted the request

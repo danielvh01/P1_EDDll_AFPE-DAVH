@@ -2,14 +2,14 @@
 <nav class="navigation-bar row">
     <h2 class="text-white col-9 ml-3 p-0 m-0">Ha iniciado sesión como: @ViewBag.Username</h2>
     <a class="btn-claro my-0">Nuevo Chat</a>
-    <a class="btn-claro my-0">Contactos</a>
-    <a class="btn-claro my-0">Cerrar sesión</a>
+    <a class="btn-claro my-0" asp-action="Contacts">Contactos</a>
+    <a class="btn-claro my-0" asp-action="LogOut">Cerrar sesión</a>
 </nav>
 <div class="row">
     <div class="col-12">
         @foreach (var e in Model)
         {
-            <a class="pl-4 chat-item row" href="~/Chat/Room?room=@e.ID">@e.name</a>
-        }
+            @Html.ActionLink(e.name, "ChatRoom", e.ID, new Dictionary<string, object> { { "class", "pl-4 chat-item row" } });
+    }
     </div>
 </div>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using DataStructures;
 
 namespace P1_EDDll_AFPE_DAVH.Models
 {
@@ -17,14 +18,12 @@ namespace P1_EDDll_AFPE_DAVH.Models
         public List<string> Contacts { get; set; }
         public List<string> ConnectionRequests { get; set; }
         public List<Chat> Chats { get; set; }
-        public int k1 { get; }
-        public int k2 { get; }
-
+        public int a { get; set; }
+        public int n { get; set; }
+        public int d { get; set;}        
+        public int e { get; set; }
         public User()
         {
-            Contacts = new List<string>();
-            ConnectionRequests = new List<string>();
-            Chats = new List<Chat>();
         }
 
     }

@@ -1,0 +1,26 @@
+﻿@model P1_EDDll_AFPE_DAVH.Models.User
+<nav class="navigation-bar row">
+    <h2 class="text-white col-9 ml-3 p-0 m-0">Contactos</h2>
+    <a class="btn-claro my-0" asp-action="newContact">Añadir contacto</a>
+    <a class="btn-claro my-0" asp-action="ListChat">Regresar</a>
+</nav>
+<div class="row maxheight">
+    <div class="col-6 list-contacts">
+        <h2 class="row mt-5 text-center titulo-lista">Lista de Contactos</h2>
+        @foreach(var contact in Model.Contacts)
+        {
+            <div class="row contact"><h3 class="col-12">@contact</h3></div>
+        }
+    </div>
+    <div class="col-6 list-requests">
+        <h2 class="row mt-5 text-center titulo-lista">Lista de Solicitudes</h2>
+        @foreach(var request in Model.ConnectionRequests)
+        {
+            <div class="row request">
+                <h3 class="col-8 item">@request</h3>
+                <span class="btn-principal col-2">@Html.ActionLink("Aceptar", "AccceptRequest", request)</span>
+                <span class="btn-principal col-2">@Html.ActionLink("Denegar", "DenegateRequest", request)</span>
+            </div>
+        }
+    </div>
+</div>

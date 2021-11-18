@@ -27,8 +27,4 @@
     <ProjectReference Include="DataStructures\DataStructures.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\Menu\" />
-  </ItemGroup>
-
 </Project>
