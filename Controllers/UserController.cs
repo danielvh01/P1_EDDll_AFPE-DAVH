@@ -19,6 +19,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
     public class UserController : Controller
     {
         const string SessionID = "_UID";
+        const string SessionUsername = "_Username";
         private readonly IHostingEnvironment hostingEnvironment;
 
         public UserController(IHostingEnvironment hostingEnvironment)
@@ -38,15 +39,19 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         }
 
         // GET: UserController/Details/5
-        public ActionResult Details(int id)
+        public ActionResult ChatRoom(string id)
         {
-            return View();
+            List<Message> mensajesMostrados = new List<Message>();
+            return View("/Views/Chat/Room.cshtml", mensajesMostrados);
         }
 
         // GET: UserController/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Contacts()
         {
-            return View();
+            var response = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
+            var user = response.Content.ReadAsStringAsync().Result;
+            User currentUser = JsonSerializer.Deserialize<User>(user);
+            return View("/Views/Chat/Contactos.cshtml", User);
         }
 
         [HttpGet]
@@ -73,6 +78,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                 var request = RM.Content.ReadAsStringAsync().Result;
                 var Id= JsonSerializer.Deserialize<string>(request);
                 HttpContext.Session.SetString(SessionID, Id);
+                HttpContext.Session.SetString(SessionUsername, credencials.Username);
                 return RedirectToAction(nameof(ListChat));
             }
             else
