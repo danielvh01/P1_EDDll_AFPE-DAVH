@@ -6,6 +6,8 @@ for details on configuring this project to bundle and minify static web assets. 
     --secundario: #DDDDDD;
     --blanco: #FFFFFF;
     --negro: #000000;
+    --text-gris: #666666;
+    --presionado: #D9D9D9;
 }
 
 a.navbar-brand {
@@ -31,10 +33,99 @@ a {
   border-color: #1861ac;
 }
 
+.footer-emisor{
+    background-color: var(--secundario);
+    padding: 15px;
+    margin: 0px;
+    border: 0px;
+    width: 100%;
+}
+
+.icon-btn{
+    color: var(--text-gris);
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+}
+
+.emisor-mensaje {
+    color: var(--principal);
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+}
+
+.text-message {
+    color: var(--principal);
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+}
+
+.titulo {
+    color: var(--principal);
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+}
+
+.icon-btn:hover {
+    color: var(--text-gris);
+    margin: 0px;
+    padding: 0px;
+    border: 1px solid var(--text-gris);
+    cursor:pointer;
+}
+.icon-btn:active {
+    color: var(--text-gris);
+    background-color:var(--presionado);
+    margin: 0px;
+    padding: 0px;
+    border: 1px solid var(--text-gris);
+    cursor: pointer;
+}
+
+.mensajes{
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    margin: 0px;
+    border: 0px;
+    background-color: var(--blanco);
+    overflow-y: scroll;
+    overflow-x: no-display;
+}
+
+.mensaje {
+    border-radius: 10px;
+    border: 1px var(--secundario) solid;
+    margin: 0px;
+    background-color: var(--blanco);
+    padding: 15px;
+}
+
+.mensaje-propio {
+    border-radius: 10px;
+    border: 1px var(--secundario) solid;
+    margin: 0px;
+    background-color: var(--text-gris);
+    padding: 15px;
+}
+
+.input-messagge {
+    border-radius: 10px;
+    border: 1px var(--secundario) solid;
+    margin: 0px;
+    background-color: var(--blanco);
+    color: var(--principal);
+    font-size: 15px;
+    padding: 15px;
+}
+
 .btn-principal {
     font-variant-caps: titling-caps;
     font-size: 15px;
-    padding: 15px; 
+    padding: 15px;
     background-color: var(--principal);
     border-radius: 10px;
     border: 0px;

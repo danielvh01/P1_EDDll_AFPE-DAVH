@@ -6,7 +6,40 @@
 <div class="mensajes">
     @foreach (var message in Model)
     {
-        <div ng-class="{ @ViewBag.UserID == @message.Id}"></div>
+        @if (message.UserSender == ViewBag.Username && message.visible)
+        {
+            <div class="mensaje-propio offset-4 col-8">
+                <h4 class="row emisor-mensaje">@message.UserSender</h4>
+                @if(message.type == 1)
+                {
+                    <p class="row text-mensaje text-wrap">@message.content</p>
+                }
+                else
+                {
+                    <div class="row">
+                        <h3 class="col-8 titulo">@message.title</h3>
+                        <button class="col-4 icon-btn"></button>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="mensaje col-8">
+                <h4 class="row emisor-mensaje">@message.UserSender</h4>
+                @if (message.type == 1)
+                {
+                    <p class="row text-mensaje text-wrap">@message.content</p>
+                }
+                else
+                {
+                    <div class="row">
+                        <h3 class="col-8 titulo">@message.title</h3>
+                        <button class="col-4 icon-btn"></button>
+                    </div>
+                }
+            </div>
+        }
     }
 </div>
 <div class="footer-emisor row">

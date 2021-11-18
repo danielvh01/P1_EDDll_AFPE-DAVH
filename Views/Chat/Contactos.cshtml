@@ -1,0 +1,23 @@
+﻿@model P1_EDDll_AFPE_DAVH.Models.User
+<nav class="navigation-bar row">
+    <h2 class="text-white col-11 ml-3 p-0 m-0">Contactos</h2>
+    <a class="btn-claro my-0">Regresar</a>
+</nav>
+<div class="row">
+    <div class="col-6 list-contacts">
+        @foreach(var contact in Model.Contacts)
+        {
+            <div class="row contact"><h3 class="col-12">@contact</h3></div>
+        }
+    </div>
+    <div class="col-6 list-requests">
+        @foreach(var request in Model.ConnectionRequests)
+        {
+        <div class="row request">
+            <h3 class="col-8">@request</h3>
+            @Html.ActionLink("Aceptar", "AccceptRequest", request, new Dictionary<string, object> { { "class", "btn-claro col-2" } });
+            @Html.ActionLink("Denegar", "DenegateRequest", request, new Dictionary<string, object> { { "class", "btn-claro col-2" } });
+        </div>
+        }
+    </div>
+</div>

@@ -17,24 +17,25 @@ namespace P1_EDDll_AFPE_DAVH.Models
         public byte[] content { get; set; }
         public int type { get; set; }
 
-        public string IdSender { get; set; }
+        public string title { get; set; }
+        public string UserSender { get; set; }
 
         //Keys for cipher 
         public int k1  { get; set; }
         public int k2 { get; set; }
     
 
-    public Message(ObjectId _Id, byte[] _content, int _type, string _idSender ,int _k1, int _k2)
+    public Message(ObjectId _Id, byte[] _content, int _type , string _userSender, int _k1, int _k2)
         {
             Id = _Id;
             dateTime = DateTime.Now;
             visible = true;
             content = _content;
             type = _type;
-            IdSender = _idSender;
+            UserSender = _userSender;
             k1 = _k1;
             k2 = _k2;
-
+            title = "";
         }
 
         public void DeleteForMe()
