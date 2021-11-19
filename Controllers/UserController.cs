@@ -13,6 +13,11 @@ using API_DataTransfer.Data;
 using P1_EDDll_AFPE_DAVH.Models;
 using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
+using DataStructures;
+using System.IO;
+using System.Numerics;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace P1_EDDll_AFPE_DAVH.Controllers
 {
@@ -77,8 +82,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             //Si encuentra 
             if (RM.IsSuccessStatusCode)
             {
-                var request = RM.Content.ReadAsStringAsync().Result;
-                var Id = JsonSerializer.Deserialize<string>(request);
+                var Id = RM.Content.ReadAsStringAsync().Result;                
                 HttpContext.Session.SetString(SessionID, Id);
                 HttpContext.Session.SetString(SessionUsername, credencials.Username);
                 return RedirectToAction(nameof(ListChat));
@@ -111,8 +115,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                 HttpResponseMessage RM = await Client.PostAsync("api/user/", content);
                 if (RM.IsSuccessStatusCode)
                 {
-                    var request = RM.Content.ReadAsStringAsync().Result;
-                    var Id = JsonSerializer.Deserialize<string>(request);
+                    var Id = RM.Content.ReadAsStringAsync().Result;                    
                     HttpContext.Session.SetString(SessionID, Id);
                     return RedirectToAction(nameof(ListChat));
                 }
@@ -127,6 +130,47 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                 TempData["testmsg"] = "Las contrasenas no coinciden.";
                 return View("/Views/Login/_Registro.cshtml", new Register());
             }
+        }
+
+        public async Task<IActionResult> SendMessage(string ID,string message)
+        {
+            string sessionUser = HttpContext.Session.GetString(SessionID);
+            HttpResponseMessage RM = await Client.GetAsync("api/user/chatRoom/" + ID);
+
+            HttpResponseMessage RM2 = await Client.GetAsync("api/user/" + sessionUser);
+            User currentuser = JsonSerializer.Deserialize<User>(RM2.Content.ReadAsStringAsync().Result);
+
+            var request = RM.Content.ReadAsStringAsync().Result;
+            var _chat = JsonSerializer.Deserialize<ChatRoom>(request);
+            
+            if (_chat.type == 1)
+            {
+                SDES cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
+                Message mensaje;
+                
+                //Como llave sdes mandar la que se genera de diffie helman entre los usuarios
+                if (_chat.Users.FindIndex(x => x == sessionUser) == 0)
+                {
+                    mensaje = new Message(ObjectId.GenerateNewId(), cipher.Cipher(GetBytes(message), (int)BigInteger.ModPow(_chat.A, currentuser.a, _chat.p)).ToList(), 1, sessionUser, 0, 0);                    
+                }
+                else
+                {
+                    mensaje = new Message(ObjectId.GenerateNewId(), cipher.Cipher(GetBytes(message), (int)BigInteger.ModPow(_chat.B, currentuser.a, _chat.p)).ToList(), 1, sessionUser, 0, 0);
+                }
+                _chat.Messages.Add(mensaje);
+            }
+            else
+            {                
+                RSA groupCipher = new RSA();
+                int[] keys = { currentuser.n, currentuser.e };
+                Message mensaje = new Message(ObjectId.GenerateNewId(), groupCipher.Cipher(GetBytes(message), keys).ToList(),1, sessionUser,currentuser.n,currentuser.d);
+                _chat.Messages.Add(mensaje);
+                
+            }
+            var json = JsonSerializer.Serialize(_chat);
+            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+            await Client.PutAsync("api/user/chat/" + ID , content);
+            return RedirectToAction(nameof(ChatRoom),ID);
         }
 
 
@@ -219,5 +263,20 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                 return View("/Views/Chat/newContact.cshtml");
             }
         }
+
+        static byte[] GetBytes(string str)
+        {
+            byte[] bytes = new byte[str.Length * sizeof(char)];
+            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            return bytes;
+        }
+
+        static string GetString(byte[] bytes)
+        {
+            char[] chars = new char[bytes.Length / sizeof(char)];
+            System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+            return new string(chars);
+        }
+
     }
 }

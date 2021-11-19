@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using API_DataTransfer.Data;
-using System.Text.Json;
+﻿using API_DataTransfer.Data;
 using API_DataTransfer.Models;
-using Microsoft.AspNetCore.Http;
+using DataStructures;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -30,6 +30,18 @@ namespace API_DataTransfer.Controllers
             }
             FindUser.Id = new MongoDB.Bson.ObjectId(ID);
             return Ok(JsonSerializer.Serialize(FindUser));
+        }
+
+        [HttpGet("getUsername/{ID}")]
+        public async Task<IActionResult> GetUsername([FromRoute] string ID)
+        {
+            var FindUser = await usersDB.GetUserFromID(ID);
+            if (FindUser == null)
+            {
+                return BadRequest();
+            }
+            FindUser.Id = new MongoDB.Bson.ObjectId(ID);
+            return Ok(FindUser.Username);
         }
 
         [HttpGet("getByUser/{Username}")]
@@ -57,10 +69,12 @@ namespace API_DataTransfer.Controllers
 
             }
             User newUser = new User();
+            SDES cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
+            byte[] PasswordBytes = GetBytes(_user.Password);
             newUser.Username = _user.Username;
-            newUser.Password = _user.Password;
+            newUser.Password = GetString(cipher.Cipher(PasswordBytes,8));
             await usersDB.AddUsers(newUser);
-            return Created("Created", JsonSerializer.Serialize(newUser.Id.ToString()));
+            return Created("Created", newUser.Id.ToString());
         }
 
         [HttpPost("login")]
@@ -69,12 +83,15 @@ namespace API_DataTransfer.Controllers
             string JsonObj = Juser.ToString();
             Login user = JsonSerializer.Deserialize<Login>(JsonObj);
             List<User> UserRegistry = usersDB.GetAllUsers().Result.ToList();
+            SDES cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
+            byte[] PasswordBytes = GetBytes(user.Password);
+            string passwordCiphered = GetString(cipher.Cipher(PasswordBytes, 8));
             for (int i = 0; i < UserRegistry.Count; i++)
             {
-                if (UserRegistry.ElementAt(i).Username == user.Username && UserRegistry.ElementAt(i).Password == user.Password)
+                if (UserRegistry.ElementAt(i).Username == user.Username && UserRegistry.ElementAt(i).Password == passwordCiphered)
                 {
                     var FindUser = UserRegistry.Find(x => x.Username == user.Username);
-                    return Ok(JsonSerializer.Serialize(FindUser.Id.ToString()));
+                    return Ok(FindUser.Id.ToString());
                 }
             }
             return BadRequest();
@@ -93,54 +110,59 @@ namespace API_DataTransfer.Controllers
             return Ok();
         }
 
-        [HttpPut("addContact/{idSender}/{idReceiver}")]
-        public async Task<IActionResult> AddContact(string idSender, string idReceiver)
+        [HttpPut("addContact/{idReceiver}")]
+        public async Task<IActionResult> AddContact([FromRoute] string _Receiver,[FromBody]JsonElement Sender)
         {
-            var _user = await usersDB.GetUserFromID(idReceiver);
+            var _sender = JsonSerializer.Deserialize<Contact>(Sender.ToString());            
+
+            var _user = await usersDB.GetUserFromID(_Receiver);
             if (_user == null)
             {
                 return BadRequest();
             }
-            _user.Id = new MongoDB.Bson.ObjectId(idReceiver);
-            _user.ConnectionRequests.Add(idSender);
+            _user.Id = new MongoDB.Bson.ObjectId(_Receiver);
+            _user.ConnectionRequests.Add(_sender);
             await usersDB.PutUser(_user);
             return Ok();
         }
 
-        [HttpPut("accept/{idSender}/{idReceiver}")]
-        public async Task<IActionResult> AcceptRequest(string idSender, string idReceiver)
+        [HttpPut("accept")]
+        public async Task<IActionResult> AcceptRequest(JsonElement Sender, JsonElement Receiver)
         {
+            var _sender = JsonSerializer.Deserialize<Contact>(Sender.ToString());
+            var _Receiver = JsonSerializer.Deserialize<Contact>(Receiver.ToString());
             //Search the user that accepted the request
-            var _user = await usersDB.GetUserFromID(idReceiver);
+            var _user = await usersDB.GetUserFromID(_Receiver.ID);
             if (_user == null)
             {
                 return BadRequest();
             }
-            _user.Id = new MongoDB.Bson.ObjectId(idReceiver);
+            _user.Id = new MongoDB.Bson.ObjectId(_Receiver.ID);
             //Remove the request from the request list
-            _user.ConnectionRequests.Remove(idSender);
+            _user.ConnectionRequests.Remove(_sender);
             //add to the contacts the user that sent the request
-            _user.Contacts.Add(idSender);
+            _user.Contacts.Add(_sender);
             await usersDB.PutUser(_user);
 
             //Search the user that sent the request
-            var _user2 = await usersDB.GetUserFromID(idSender);
+            var _user2 = await usersDB.GetUserFromID(_sender.ID);
             if (_user2 == null)
             {
                 return BadRequest();
             }
-            _user2.Id = new MongoDB.Bson.ObjectId(idSender);
+            _user2.Id = new MongoDB.Bson.ObjectId(_sender.ID);
             //Add to contacts the user that accepted the request
-            _user2.Contacts.Add(idReceiver);
+            _user2.Contacts.Add(_Receiver);
             await usersDB.PutUser(_user2);
             return Ok();
         }
 
 
-        [HttpPut("reject/{idSender}/{idReceiver}")]
-        public async Task<IActionResult> RejectRequest([FromRoute] string idSender, string idReceiver)
+        [HttpPut("reject/{idReceiver}")]
+        public async Task<IActionResult> RejectRequest([FromBody] JsonElement Sender, [FromRoute] string idReceiver)
         {
             //Search the user that accepted the request
+            var _sender = JsonSerializer.Deserialize<Contact>(Sender.ToString());            
             var _user = await usersDB.GetUserFromID(idReceiver);
             if (_user == null)
             {
@@ -148,7 +170,7 @@ namespace API_DataTransfer.Controllers
             }
             _user.Id = new MongoDB.Bson.ObjectId(idReceiver);
             //Remove the request from the request list
-            _user.ConnectionRequests.Remove(idSender);
+            _user.ConnectionRequests.Remove(_sender);
             await usersDB.PutUser(_user);
             return Ok();
         }
@@ -164,15 +186,44 @@ namespace API_DataTransfer.Controllers
         [HttpPut("chat/{ID}")]
         public async Task<IActionResult> UpdateChat([FromRoute] string id, [FromBody] JsonElement JChat)
         {
+            
             ChatRoom _chat = JsonSerializer.Deserialize<ChatRoom>(JChat.ToString());
             if (_chat == null)
             {
                 return BadRequest();
             }
-            _chat.Id = new MongoDB.Bson.ObjectId(id);
+            _chat.Id = new MongoDB.Bson.ObjectId(id);            
             await chatRoomDB.PutChatRoom(_chat);
             return Ok();
         }
+
+
+        [HttpGet("  {ID}")]
+        public async Task<IActionResult> GetSpecifiedChat([FromRoute] string ID)
+        {
+            var FindChat = await chatRoomDB.GetChatFromID(ID);
+            if (FindChat == null)
+            {
+                return BadRequest();
+            }
+            FindChat.Id = new MongoDB.Bson.ObjectId(ID);           
+            return Ok(JsonSerializer.Serialize(FindChat));
+        }
+
+        static byte[] GetBytes(string str)
+        {
+            byte[] bytes = new byte[str.Length * sizeof(char)];
+            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            return bytes;
+        }
+
+        static string GetString(byte[] bytes)
+        {
+            char[] chars = new char[bytes.Length / sizeof(char)];
+            System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+            return new string(chars);
+        }
+
 
     }
 }
