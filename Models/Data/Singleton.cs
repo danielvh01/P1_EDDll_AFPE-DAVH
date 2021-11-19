@@ -15,14 +15,6 @@ namespace P1_EDDll_AFPE_DAVH.Models.Data
     public class Singleton : Controller
     {
         private readonly static Singleton _instance = new Singleton();
-
-        public static Starter.Starter api;
-        public HttpClient Client;
-        public Singleton()
-        {
-            api = new Starter.Starter();
-            Client = api.Start();
-        }
                 
         public static Singleton Instance
         {

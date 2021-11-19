@@ -140,7 +140,6 @@ a {
 .btn-principal a {
     font-variant-caps: titling-caps;
     font-size: 15px;
-    padding: 15px 0px 15px 0px;
     background-color: var(--principal);
     border-radius: 10px;
     border: 0px;
@@ -149,7 +148,6 @@ a {
 }
 
 span.btn-principal {
-    padding: 0px;
     border: 0px;
     margin: 10px 5px;
 }
