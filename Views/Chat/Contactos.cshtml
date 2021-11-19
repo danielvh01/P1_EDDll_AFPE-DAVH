@@ -9,7 +9,7 @@
         <h2 class="row mt-5 text-center titulo-lista">Lista de Contactos</h2>
         @foreach(var contact in Model.Contacts)
         {
-            <div class="row contact"><h3 class="col-12">@contact</h3></div>
+            <div class="row contact"><h3 class="col-12">@contact.Username</h3></div>
         }
     </div>
     <div class="col-6 list-requests">
@@ -17,7 +17,7 @@
         @foreach(var request in Model.ConnectionRequests)
         {
             <div class="row request">
-                <h3 class="col-8 item">@request</h3>
+                <h3 class="col-8 item">@request.Username</h3>
                 <span class="btn-principal col-2">@Html.ActionLink("Aceptar", "AccceptRequest", request)</span>
                 <span class="btn-principal col-2">@Html.ActionLink("Denegar", "DenegateRequest", request)</span>
             </div>

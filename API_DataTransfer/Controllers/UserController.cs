@@ -40,7 +40,6 @@ namespace API_DataTransfer.Controllers
             {
                 return BadRequest();
             }
-            FindUser.Id = new MongoDB.Bson.ObjectId(ID);
             return Ok(FindUser.Username);
         }
 
@@ -62,12 +61,8 @@ namespace API_DataTransfer.Controllers
             Login _user = JsonSerializer.Deserialize<Login>(Juser.ToString());
             List<User> UserRegistry = await usersDB.GetAllUsers();
             //Verify if the username exists
-            for (int i = 0; i < UserRegistry.Count; i++)
-            {
-                if (UserRegistry.ElementAt(i).Username == _user.Username)
-                    return BadRequest();
-
-            }
+            if (UserRegistry.Find(x => x.Username == _user.Username) != null)
+                return BadRequest();
             User newUser = new User();
             SDES cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
             byte[] PasswordBytes = GetBytes(_user.Password);
@@ -88,10 +83,10 @@ namespace API_DataTransfer.Controllers
             string passwordCiphered = GetString(cipher.Cipher(PasswordBytes, 8));
             for (int i = 0; i < UserRegistry.Count; i++)
             {
-                if (UserRegistry.ElementAt(i).Username == user.Username && UserRegistry.ElementAt(i).Password == passwordCiphered)
+                User temp = UserRegistry.ElementAt(i);
+                if (temp.Username == user.Username && temp.Password == passwordCiphered)
                 {
-                    var FindUser = UserRegistry.Find(x => x.Username == user.Username);
-                    return Ok(FindUser.Id.ToString());
+                    return Ok(temp.Id.ToString());
                 }
             }
             return BadRequest();
@@ -110,35 +105,39 @@ namespace API_DataTransfer.Controllers
             return Ok();
         }
 
-        [HttpPut("addContact/{idReceiver}")]
-        public async Task<IActionResult> AddContact([FromRoute] string _Receiver,[FromBody]JsonElement Sender)
+        [HttpPost("addingContact")]
+        public async Task<IActionResult> AddContact([FromBody] JsonElement request)
         {
-            var _sender = JsonSerializer.Deserialize<Contact>(Sender.ToString());            
-
-            var _user = await usersDB.GetUserFromID(_Receiver);
+            var _request = JsonSerializer.Deserialize<ContactRequest>(request.ToString());
+            var _user = await usersDB.GetUserFromID(_request.IDReceiver);
             if (_user == null)
             {
                 return BadRequest();
             }
-            _user.Id = new MongoDB.Bson.ObjectId(_Receiver);
+            _user.Id = new MongoDB.Bson.ObjectId(_request.IDReceiver);
+            var _sender = new Contact();
+            _sender.ID = _request.IDSender;
+            _sender.Username = _request.UsernameSender;
             _user.ConnectionRequests.Add(_sender);
             await usersDB.PutUser(_user);
             return Ok();
         }
 
-        [HttpPut("accept")]
-        public async Task<IActionResult> AcceptRequest(JsonElement Sender, JsonElement Receiver)
+        [HttpPost("accept")]
+        public async Task<IActionResult> AcceptRequest([FromBody] JsonElement request)
         {
-            var _sender = JsonSerializer.Deserialize<Contact>(Sender.ToString());
-            var _Receiver = JsonSerializer.Deserialize<Contact>(Receiver.ToString());
+            var _request = JsonSerializer.Deserialize<ContactRequest>(request.ToString());
             //Search the user that accepted the request
-            var _user = await usersDB.GetUserFromID(_Receiver.ID);
+            var _user = await usersDB.GetUserFromID(_request.IDReceiver);
             if (_user == null)
             {
                 return BadRequest();
             }
-            _user.Id = new MongoDB.Bson.ObjectId(_Receiver.ID);
+            _user.Id = new MongoDB.Bson.ObjectId(_request.IDReceiver);
             //Remove the request from the request list
+            Contact _sender = new Contact();
+            _sender.ID = _request.IDSender;
+            _sender.Username = _request.UsernameSender;
             _user.ConnectionRequests.Remove(_sender);
             //add to the contacts the user that sent the request
             _user.Contacts.Add(_sender);
@@ -152,24 +151,30 @@ namespace API_DataTransfer.Controllers
             }
             _user2.Id = new MongoDB.Bson.ObjectId(_sender.ID);
             //Add to contacts the user that accepted the request
+            Contact _Receiver = new Contact();
+            _Receiver.ID = _request.IDReceiver;
+            _Receiver.Username = _request.UsernameReceiver;
             _user2.Contacts.Add(_Receiver);
             await usersDB.PutUser(_user2);
             return Ok();
         }
 
 
-        [HttpPut("reject/{idReceiver}")]
-        public async Task<IActionResult> RejectRequest([FromBody] JsonElement Sender, [FromRoute] string idReceiver)
+        [HttpPost("reject")]
+        public async Task<IActionResult> RejectRequest([FromBody] JsonElement request)
         {
+            var _request = JsonSerializer.Deserialize<ContactRequest>(request.ToString());
             //Search the user that accepted the request
-            var _sender = JsonSerializer.Deserialize<Contact>(Sender.ToString());            
-            var _user = await usersDB.GetUserFromID(idReceiver);
+            var _user = await usersDB.GetUserFromID(_request.IDReceiver);
             if (_user == null)
             {
                 return BadRequest();
             }
-            _user.Id = new MongoDB.Bson.ObjectId(idReceiver);
+            _user.Id = new MongoDB.Bson.ObjectId(_request.IDReceiver);
             //Remove the request from the request list
+            var _sender = new Contact();
+            _sender.ID = _request.IDSender;
+            _sender.Username = _request.UsernameSender;
             _user.ConnectionRequests.Remove(_sender);
             await usersDB.PutUser(_user);
             return Ok();
@@ -183,7 +188,7 @@ namespace API_DataTransfer.Controllers
             return Created("Created", JsonSerializer.Serialize(_chat.Id.ToString()));
         }
 
-        [HttpPut("chat/{ID}")]
+        [HttpPost("chat/{ID}")]
         public async Task<IActionResult> UpdateChat([FromRoute] string id, [FromBody] JsonElement JChat)
         {
             
