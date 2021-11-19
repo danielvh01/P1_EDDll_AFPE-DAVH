@@ -210,7 +210,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                             contact.IDSender = HttpContext.Session.GetString(SessionID);
                             contact.UsernameSender = HttpContext.Session.GetString(SessionUsername);
                             contact.IDReceiver = ID;
-                            await Singleton.Instance.Client.PostAsync("api/user/addingContact", new StringContent(JsonSerializer.Serialize(contact)));
+                            await Singleton.Instance.Client.PutAsync("api/user/addingContact", new StringContent(JsonSerializer.Serialize(contact).ToString(), Encoding.UTF8, "application/json"));
                             return RedirectToAction(nameof(Contacts));
                             
                         }
@@ -247,14 +247,15 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
 
             request.IDSender = contact.ID;
             request.UsernameSender = contact.Username;
-            if (Singleton.Instance.Client.PostAsync("api/user/accept",new StringContent(JsonSerializer.Serialize(request))).IsCompletedSuccessfully)
+            var RM = await Singleton.Instance.Client.PutAsync("api/user/accept", new StringContent(JsonSerializer.Serialize(request).ToString(), Encoding.UTF8, "application/json"));
+            if (RM.IsSuccessStatusCode)
             {
-                return View("/Views/Chat/newContact.cshtml");
+                return RedirectToAction(nameof(Contacts));
             }
             else
             {
                 TempData["testmsg"] = "No se pudo aceptar la solicitud";
-                return View("/Views/Chat/newContact.cshtml");
+                return RedirectToAction(nameof(Contacts));
             }
         }
         public async Task<IActionResult> DenegateRequest(Contact contact)
@@ -263,14 +264,15 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             contactR.IDSender = contact.ID;
             contactR.UsernameSender = contact.Username;
             contactR.IDReceiver = HttpContext.Session.GetString(SessionID);
-            if (Singleton.Instance.Client.PostAsync("api/user/reject", new StringContent(JsonSerializer.Serialize(contactR))).IsCompletedSuccessfully)
+            var RM = await Singleton.Instance.Client.PutAsync("api/user/reject", new StringContent(JsonSerializer.Serialize(contactR).ToString(), Encoding.UTF8, "application/json"));
+            if (RM.IsSuccessStatusCode)
             {
-                return View("/Views/Chat/newContact.cshtml");
+                return RedirectToAction(nameof(Contacts));
             }
             else
             {
                 TempData["testmsg"] = "No se pudo denegar la solicitud";
-                return View("/Views/Chat/newContact.cshtml");
+                return RedirectToAction(nameof(Contacts));
             }
         }
 

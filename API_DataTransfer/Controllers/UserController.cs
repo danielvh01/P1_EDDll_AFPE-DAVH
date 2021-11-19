@@ -105,7 +105,7 @@ namespace API_DataTransfer.Controllers
             return Ok();
         }
 
-        [HttpPost("addingContact")]
+        [HttpPut("addingContact")]
         public async Task<IActionResult> AddContact([FromBody] JsonElement request)
         {
             var _request = JsonSerializer.Deserialize<ContactRequest>(request.ToString());
@@ -123,7 +123,7 @@ namespace API_DataTransfer.Controllers
             return Ok();
         }
 
-        [HttpPost("accept")]
+        [HttpPut("accept")]
         public async Task<IActionResult> AcceptRequest([FromBody] JsonElement request)
         {
             var _request = JsonSerializer.Deserialize<ContactRequest>(request.ToString());
@@ -138,10 +138,11 @@ namespace API_DataTransfer.Controllers
             Contact _sender = new Contact();
             _sender.ID = _request.IDSender;
             _sender.Username = _request.UsernameSender;
-            _user.ConnectionRequests.Remove(_sender);
-            //add to the contacts the user that sent the request
+            _user.ConnectionRequests.RemoveAt(_user.ConnectionRequests.FindIndex(x => x.ID == _sender.ID && x.Username == _sender.Username));
             _user.Contacts.Add(_sender);
             await usersDB.PutUser(_user);
+            //add to the contacts the user that sent the request
+
 
             //Search the user that sent the request
             var _user2 = await usersDB.GetUserFromID(_sender.ID);
@@ -160,7 +161,7 @@ namespace API_DataTransfer.Controllers
         }
 
 
-        [HttpPost("reject")]
+        [HttpPut("reject")]
         public async Task<IActionResult> RejectRequest([FromBody] JsonElement request)
         {
             var _request = JsonSerializer.Deserialize<ContactRequest>(request.ToString());
@@ -175,7 +176,7 @@ namespace API_DataTransfer.Controllers
             var _sender = new Contact();
             _sender.ID = _request.IDSender;
             _sender.Username = _request.UsernameSender;
-            _user.ConnectionRequests.Remove(_sender);
+            _user.ConnectionRequests.RemoveAt(_user.ConnectionRequests.FindIndex(x => x.ID == _sender.ID && x.Username == _sender.Username));
             await usersDB.PutUser(_user);
             return Ok();
         }
@@ -188,7 +189,7 @@ namespace API_DataTransfer.Controllers
             return Created("Created", JsonSerializer.Serialize(_chat.Id.ToString()));
         }
 
-        [HttpPost("chat/{ID}")]
+        [HttpPut("chat/{ID}")]
         public async Task<IActionResult> UpdateChat([FromRoute] string id, [FromBody] JsonElement JChat)
         {
             
