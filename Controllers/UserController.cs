@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Text;
 using MongoDB.Driver;
-using P1_EDDll_AFPE_DAVH.Starter;
-using API_DataTransfer.Data;
 using P1_EDDll_AFPE_DAVH.Models;
 using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +16,7 @@ using System.IO;
 using System.Numerics;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using P1_EDDll_AFPE_DAVH.Models.Data;
 
 namespace P1_EDDll_AFPE_DAVH.Controllers
 {
@@ -30,12 +29,9 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         public UserController(IHostingEnvironment hostingEnvironment)
         {
             this.hostingEnvironment = hostingEnvironment;
-            api = new Starter.Starter();
-            Client = api.Start();
         }
 
-        Starter.Starter api;
-        HttpClient Client;
+        
 
         // GET: UserController
         public ActionResult LogOut()
@@ -55,7 +51,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         // GET: UserController/Create
         public async Task<ActionResult> Contacts()
         {
-            var response = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
+            var response = await Singleton.Instance.Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
             var user = response.Content.ReadAsStringAsync().Result;
             User currentUser = JsonSerializer.Deserialize<User>(user);
             return View("/Views/Chat/Contactos.cshtml", currentUser);
@@ -78,7 +74,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             credencials.Password = collection["Password"];
             var json = JsonSerializer.Serialize(credencials);
             var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            HttpResponseMessage RM = await Client.PostAsync("api/user/login", content);
+            HttpResponseMessage RM = await Singleton.Instance.Client.PostAsync("api/user/login", content);
             //Si encuentra 
             if (RM.IsSuccessStatusCode)
             {
@@ -112,11 +108,12 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                 credencials.Password = collection["Password"];
                 var json = JsonSerializer.Serialize(credencials);
                 var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-                HttpResponseMessage RM = await Client.PostAsync("api/user/", content);
+                HttpResponseMessage RM = await Singleton.Instance.Client.PostAsync("api/user/", content);
                 if (RM.IsSuccessStatusCode)
                 {
                     var Id = RM.Content.ReadAsStringAsync().Result;                    
                     HttpContext.Session.SetString(SessionID, Id);
+                    HttpContext.Session.SetString(SessionUsername, credencials.Username);
                     return RedirectToAction(nameof(ListChat));
                 }
                 else
@@ -135,9 +132,9 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         public async Task<IActionResult> SendMessage(string ID,string message)
         {
             string sessionUser = HttpContext.Session.GetString(SessionID);
-            HttpResponseMessage RM = await Client.GetAsync("api/user/chatRoom/" + ID);
+            HttpResponseMessage RM = await Singleton.Instance.Client.GetAsync("api/user/chatRoom/" + ID);
 
-            HttpResponseMessage RM2 = await Client.GetAsync("api/user/" + sessionUser);
+            HttpResponseMessage RM2 = await Singleton.Instance.Client.GetAsync("api/user/" + sessionUser);
             User currentuser = JsonSerializer.Deserialize<User>(RM2.Content.ReadAsStringAsync().Result);
 
             var request = RM.Content.ReadAsStringAsync().Result;
@@ -169,7 +166,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             }
             var json = JsonSerializer.Serialize(_chat);
             var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            await Client.PutAsync("api/user/chat/" + ID , content);
+            await Singleton.Instance.Client.PostAsync("api/user/chat/" + ID , content);
             return RedirectToAction(nameof(ChatRoom),ID);
         }
 
@@ -177,7 +174,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         // GET: UserController/Edit/5
         public async Task<ActionResult> ListChat()
         {
-            HttpResponseMessage RM = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
+            HttpResponseMessage RM = await Singleton.Instance.Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
             User currentuser = JsonSerializer.Deserialize<User>(RM.Content.ReadAsStringAsync().Result);
             ViewBag.Username = currentuser.Username;
             return View("/Views/Chat/ListaChats.cshtml", currentuser.Chats);
@@ -193,24 +190,27 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         [HttpPost]
         public async Task<ActionResult> newContact(IFormCollection collection)
         {
-            HttpResponseMessage RM = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
+            HttpResponseMessage RM = await Singleton.Instance.Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
 
-            HttpResponseMessage RM2 = await Client.GetAsync("api/user/getByUser/" + collection["Username"]);
+            HttpResponseMessage RM2 = await Singleton.Instance.Client.GetAsync("api/user/getByUser/" + collection["Username"]);
 
             if (RM.IsSuccessStatusCode && RM2.IsSuccessStatusCode)
             {
                 User currentUser = JsonSerializer.Deserialize<User>(RM.Content.ReadAsStringAsync().Result);
                 string ID = JsonSerializer.Deserialize<string>(RM2.Content.ReadAsStringAsync().Result);
-                HttpResponseMessage RM3 = await Client.GetAsync("api/user/" + ID);
+                HttpResponseMessage RM3 = await Singleton.Instance.Client.GetAsync("api/user/" + ID);
                 User User = JsonSerializer.Deserialize<User>(RM3.Content.ReadAsStringAsync().Result);
-                if (currentUser.Contacts.Find(x => x == User.Username) == null)
+                if (currentUser.Contacts.Find(x => x.ID == ID) == null)
                 {
-                    if (User.ConnectionRequests.Find(x => x == HttpContext.Session.GetString(SessionID)) == null)
+                    if (User.ConnectionRequests.Find(x => x.ID == HttpContext.Session.GetString(SessionID)) == null)
                     {
-                        if (currentUser.ConnectionRequests.Find(x => x == User.Username) == null)
+                        if (currentUser.ConnectionRequests.Find(x => x.ID == ID) == null)
                         {
-                            await Client.PutAsync("api/user/addContact/" + HttpContext.Session.GetString(SessionID) + "/" + ID, null);
-                            
+                            ContactRequest contact = new ContactRequest();
+                            contact.IDSender = HttpContext.Session.GetString(SessionID);
+                            contact.UsernameSender = HttpContext.Session.GetString(SessionUsername);
+                            contact.IDReceiver = ID;
+                            await Singleton.Instance.Client.PostAsync("api/user/addingContact", new StringContent(JsonSerializer.Serialize(contact)));
                             return RedirectToAction(nameof(Contacts));
                             
                         }
@@ -222,7 +222,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                     }
                     else
                     {
-                        TempData["testmsg"] = "Ya tiene una solicitud pendiente";
+                        TempData["testmsg"] = "El usuario ya tiene una solicitud pendiente suya";
                         return View("/Views/Chat/newContact.cshtml");
                     }
                 }
@@ -239,9 +239,15 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             }
         }
 
-        public async Task<IActionResult> AccceptRequest(string ID)
+        public async Task<IActionResult> AccceptRequest(Contact contact)
         {
-            if(Client.PutAsync("api/user/accept/" + HttpContext.Session.GetString(SessionID) + "/" + ID, null).IsCompletedSuccessfully)
+            ContactRequest request = new ContactRequest();
+            request.IDReceiver = HttpContext.Session.GetString(SessionID);
+            request.UsernameReceiver = HttpContext.Session.GetString(SessionUsername);
+
+            request.IDSender = contact.ID;
+            request.UsernameSender = contact.Username;
+            if (Singleton.Instance.Client.PostAsync("api/user/accept",new StringContent(JsonSerializer.Serialize(request))).IsCompletedSuccessfully)
             {
                 return View("/Views/Chat/newContact.cshtml");
             }
@@ -251,9 +257,13 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                 return View("/Views/Chat/newContact.cshtml");
             }
         }
-        public async Task<IActionResult> DenegateRequest(string ID)
+        public async Task<IActionResult> DenegateRequest(Contact contact)
         {
-            if (Client.PutAsync("api/user/reject/" + HttpContext.Session.GetString(SessionID) + "/" + ID, null).IsCompletedSuccessfully)
+            ContactRequest contactR = new ContactRequest();
+            contactR.IDSender = contact.ID;
+            contactR.UsernameSender = contact.Username;
+            contactR.IDReceiver = HttpContext.Session.GetString(SessionID);
+            if (Singleton.Instance.Client.PostAsync("api/user/reject", new StringContent(JsonSerializer.Serialize(contactR))).IsCompletedSuccessfully)
             {
                 return View("/Views/Chat/newContact.cshtml");
             }
