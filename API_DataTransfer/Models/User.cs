@@ -15,8 +15,8 @@ namespace API_DataTransfer.Models
 
         public string Username { get; set; }
         public string Password { get; set; }
-        public List<string> Contacts { get; set; }
-        public List<string> ConnectionRequests { get; set; }
+        public List<Contact> Contacts { get; set; }
+        public List<Contact> ConnectionRequests { get; set; }
         public List<Chat> Chats { get; set; }
         public int a { get; set; }
         public int n { get; set; }
@@ -26,8 +26,8 @@ namespace API_DataTransfer.Models
         {
             Id = ObjectId.GenerateNewId();
             Random rnd = new Random();
-            Contacts = new List<string>();
-            ConnectionRequests = new List<string>();
+            Contacts = new List<Contact>();
+            ConnectionRequests = new List<Contact>();
             Chats = new List<Chat>();
             a = rnd.Next(2,100);
 

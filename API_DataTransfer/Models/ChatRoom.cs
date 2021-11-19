@@ -11,8 +11,8 @@ namespace API_DataTransfer.Models
     {
         [BsonId]
         public ObjectId Id { get; set; }
-        List<Message> Messages { get; set; }
-        List<string> Users { get; set; }
+        public List<Message> Messages { get; set; }
+        public List<string> Users { get; set; }
         public int type { get; set; }
 
         public string name { get; set; }
