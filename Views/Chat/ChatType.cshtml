@@ -1,0 +1,11 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="row request">
+    <h3 class="col-8 item">Seleccione el tipo de chat que desea crear.</h3>
+    <span class="btn-principal">@Html.ActionLink("Individual", "ChatType", new { id = 1 })</span>
+    <span class="btn-principal">@Html.ActionLink("Grupal", "ChatType", new { id = 2 })</span>
+</div>
