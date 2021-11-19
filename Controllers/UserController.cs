@@ -293,6 +293,16 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             }
         }
 
+        public ActionResult ChatType()
+        {
+            return View("/Views/Chat/ChatType.cshtml");
+        }
+        [HttpPost]
+        public async Task<ActionResult> ChatType(int type)
+        {
+            
+        }
+
         static byte[] GetBytes(string str)
         {
             byte[] bytes = new byte[str.Length * sizeof(char)];
