@@ -6,7 +6,7 @@ namespace DataStructures
 {
     public interface ILZWCompressor
     {
-        byte[] Compress(string text);
-        string Decompression(byte[] compressedText);
+        byte[] Compress(byte[] text);
+        byte[] Decompression(byte[] compressedText);
     }
 }

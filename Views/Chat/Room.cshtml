@@ -46,7 +46,7 @@
                     {
                         <div class="row">
                             <h3 class="col-8 titulo">@message.title</h3>
-                            <button class="col-4 icon-btn"></button>
+                            <button class="col-4 icon-btn" href="@Url.Action("Download", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Descargar</button>
                         </div>
                     }
                 </div>
@@ -73,7 +73,7 @@
                 {
                     <div class="row">
                         <h3 class="col-8 titulo">@message.title</h3>
-                        <button class="col-4 icon-btn"></button>
+                        <button class="col-4 icon-btn" href="@Url.Action("Download", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Descargar</button>
                     </div>
                 }
             </div>
@@ -81,7 +81,7 @@
     }
 </div>
 <form asp-action="SendMessage" class="footer-emisor row">
-    <button class="col-1 icon-btn">Subir Archivo</button>
+    <button class="col-1 icon-btn" href="@Url.Action("SubirArchivo", new { id = ViewBag.ID})">Subir Archivo</button>
     <input name="Id" value="@ViewBag.ID" type="hidden"/>
     <input class="col-10 input-messagge" name="MessageText" type="text" placeholder="Escribe aquí tu mensaje" />
     <button class="col-1 icon-btn" type="submit">Enviar</button>
