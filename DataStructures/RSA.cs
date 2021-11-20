@@ -71,46 +71,43 @@ namespace DataStructures
 
         byte[] RSApher(byte[] content, int k1, int k2)
         {
-            
+
             if (content[0] != 0)
             {
-                byte[] cipheredContent;
-                byte[] enter = { default }; //defaut same as null
-                List<int> cipherText = new List<int>();
-                List<byte[]> arraySorter = new List<byte[]>();
+                var nums = new List<int>();
 
-                foreach (int character in content){                    
-                    cipherText.Add((int)ModularPower(character, k1, k2));
-                }
-
-                cipheredContent = cipherText.SelectMany(BitConverter.GetBytes).ToArray();
-                arraySorter.Add(enter);
-                arraySorter.Add(cipheredContent);
-                byte[] result = new byte[
-                                     arraySorter.ElementAt(0).Length +
-                                     arraySorter.ElementAt(1).Length];
-                int dstoffset = 0;
-                for (int i = 0; i < 2; i++)
+                foreach (int b in content)
                 {
-                    var element = arraySorter.ElementAt(i);
-                    Buffer.BlockCopy(element, 0, result, dstoffset, element.Length);
-                    dstoffset += element.Length;
-                }
 
-                return result;
+                    int ciphereds = (int)BigInteger.ModPow(b, k2, k1);
+                    nums.Add(ciphereds);
+
+                }
+                byte[] compressedBytes = nums.SelectMany(BitConverter.GetBytes).ToArray();
+                byte[] spacer = { default };
+                return Combine(spacer, compressedBytes);
+
             }
-            else {
+            else
+            {
                 content = content.Skip(1).ToArray();
-                var cipheredBytes = new int[(content.Length / 4)];
-                Buffer.BlockCopy(content,0, cipheredBytes,0, content.Length -1);
-                List<byte> result = new List<byte>();
-                foreach (int c in cipheredBytes)
+
+                var messageNumbers = new int[content.Length / 4];
+                Buffer.BlockCopy(content, 0, messageNumbers, 0, content.Length);
+
+                List<byte> descipherContent = new List<byte>();
+
+                foreach (int b in messageNumbers)
                 {
-                    result.Add((byte)(ModularPower(c, k1, k2)));
+
+                    int ciphered = (int)BigInteger.ModPow(b, k2, k1);
+
+                    descipherContent.Add((byte)ciphered);
                 }
-                return result.ToArray();
+
+                return descipherContent.ToArray();
             }
-            
+
         }
 
         static byte[] Combine(params byte[][] arrays)
@@ -123,26 +120,6 @@ namespace DataStructures
                 offset += array.Length;
             }
             return rv;
-        }
-
-        BigInteger ModularPower(BigInteger x, BigInteger y, BigInteger p)
-        {
-            BigInteger res = 1;
-            x = x % p;                       
-
-            if (x == 0){
-                return 0;            
-            }
-            
-            while (y > 0)
-            {
-                if ((y & 1) != 0){
-                    res = (res * x) % p;
-                }                
-                y = y >> 1;
-                x = (x * x) % p;
-            }
-            return res;
         }
 
         #endregion

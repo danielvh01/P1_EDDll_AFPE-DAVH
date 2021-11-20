@@ -13,7 +13,12 @@
                 <div class="row"><h3 class="col-12">@contact.Username</h3></div>
             </div>
         }
-
+        @if (Model.Contacts.Count == 0)
+        {
+            <div class="container row request">
+                <h3 class="col-9 item">No tiene contactos agregados</h3>
+            </div>
+        }
     </div>
     <div class="col-6 list-requests">
         <h2 class="row mt-5 text-center titulo-lista">Lista de Solicitudes</h2>
@@ -22,7 +27,13 @@
             <div class="row request">
                 <h3 class="col-8 item">@request.Username</h3>
                 <a class="btn-principal marginx padding-btn" href="@Url.Action("AccceptRequest", request)">Aceptar</a>
-                <a class="btn-principal marginx padding-btn"href="@Url.Action("DenegateRequest", request)">Denegar</a>
+                <a class="btn-principal marginx padding-btn" href="@Url.Action("DenegateRequest", request)">Denegar</a>
+            </div>
+        }
+        @if (Model.ConnectionRequests.Count == 0)
+        {
+            <div class="container row request">
+                <h3 class="col-9 item">No tiene solicitudes pendientes</h3>
             </div>
         }
     </div>
