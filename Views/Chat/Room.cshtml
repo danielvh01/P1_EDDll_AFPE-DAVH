@@ -1,6 +1,7 @@
 ﻿@model List<P1_EDDll_AFPE_DAVH.Models.Message>;
 <nav class="navigation-bar row">
-    <h2 class="text-white col-11 ml-3 p-0 m-0">@ViewBag.Chatname</h2>
+    <h2 class="text-white col-10 ml-3 p-0 m-0">@ViewBag.Chatname</h2>
+    <a class="btn-claro my-0" href="@Url.Action("ChatRoom", new { id = ViewBag.ID })">Refrescar</a>
     <a class="btn-claro my-0">Regresar</a>
 </nav>
 @{ 
@@ -17,13 +18,27 @@
 <div class="mensajes">
     @foreach (var message in Model)
     {
+        int[] keys = { message.k1, message.k2 };
         @if (message.UserSender == ViewBag.Username && message.visible)
         {
             <div class="mensaje-propio offset-4 col-7">
-                <h4 class="row emisor-mensaje">@message.UserSender</h4>
+                <div class="row">
+                    <h4 class="row emisor-mensaje">@message.UserSender</h4>
+                    <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarT", new { id = message.Id.ToString()})">Elimnar para todos</a>
+                    <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarM", new { id = message.Id.ToString()})">Elimnar para mí</a>
+                </div>
                 @if(message.type == 1)
                 {
-                    <p class="row text-mensaje text-wrap">@GetString(cipher.Decipher(message.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.B, ViewBag.ka, ViewBag.p)))</p>
+                    <p class="row text-mensaje text-wrap">
+                        @if (ViewBag.Type == 1)
+                        {
+                            @GetString(cipher.Decipher(message.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.B, ViewBag.ka, ViewBag.p)))
+                        }
+                        else
+                        {
+                            @GetString(RSACipher.Decipher(message.content.ToArray(), keys))
+                        }
+                    </p>
                 }
                 else
                 {
@@ -37,10 +52,23 @@
         else
         {
             <div class="mensaje col-7">
-                <h4 class="row emisor-mensaje">@message.UserSender</h4>
+                <div class="row">
+                    <h4 class="row emisor-mensaje">@message.UserSender</h4>
+                    <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarT", new { id = message.Id.ToString()})">Elimnar para todos</a>
+                    <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarM", new { id = message.Id.ToString()})">Elimnar para mí</a>
+                </div>
                 @if (message.type == 1)
                 {
-                    <p class="row text-mensaje text-wrap">@GetString(cipher.Decipher(message.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.A, ViewBag.ka, ViewBag.p)))</p>
+                    <p class="row text-mensaje text-wrap">
+                        @if (ViewBag.Type == 1)
+                        {
+                            @GetString(cipher.Decipher(message.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.A, ViewBag.ka, ViewBag.p)))
+                        }
+                        else
+                        {
+                            @GetString(RSACipher.Decipher(message.content.ToArray(), keys))
+                        }
+                    </p>
                 }
                 else
                 {
@@ -60,31 +88,3 @@
     <button class="col-1 icon-btn" type="submit">Enviar</button>
 </form>
 
-<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
-
-<script>
-    var connection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
-    connection.start().then(() => {
-        connection.invoke("AddToGroup", "@Model")
-    }).catch((e) => console.error(e));
-
-    document.getElementById("btnSend").addEventListener("click", (event) => {
-        let room = "@Model";
-        let user = document.getElementById("user").value;
-        let message = document.getElementById("message").value;
-
-        connection.invoke("SendMessage", room, user, message).catch((err) => console.error(err.toString()));
-        document.getElementById("message").value = "";
-        document.getElementById("message").focus();
-        event.preventDefault();
-
-    })
-
-    connection.on("ReceiveMessage", (user, message) =>
-    {
-        var message = "<div ><b>" + user + " said:</b> " + message + "</div>";
-        document.getElementById("messages").innerHTML = message + document.getElementById("messages").innerHTML;
-    }); 
-
-
-</script>

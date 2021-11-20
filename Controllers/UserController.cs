@@ -204,7 +204,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             }
             else
             {                
-                RSA groupCipher = new RSA();
+                ICipher<int[]> groupCipher = new RSA();
                 int[] keys = { currentuser.n, currentuser.e };
                 Message mensaje = new Message();
                 mensaje.Id = ObjectId.GenerateNewId();
@@ -212,12 +212,12 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                 mensaje.UserSender = HttpContext.Session.GetString(SessionUsername);
                 mensaje.k1 = currentuser.n;
                 mensaje.k2 = currentuser.d;
-
+                await Client.PutAsync("api/user/chat/sendMessage/" + ID, new StringContent(JsonSerializer.Serialize(mensaje).ToString(), Encoding.UTF8, "application/json"));
             }
-            var json = JsonSerializer.Serialize(_chat);
-            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            await Client.PostAsync("api/user/chat/" + ID , content);
-            return RedirectToAction(nameof(ChatRoom),ID);
+            //var json = JsonSerializer.Serialize(_chat);
+            //var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+            //await Client.PostAsync("api/user/chat/" + ID , content);
+            return RedirectToAction(nameof(ChatRoom),new { id = ID });
         }
 
 
@@ -274,8 +274,8 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                             contact.UsernameSender = HttpContext.Session.GetString(SessionUsername);
                             contact.IDReceiver = ID;
                             await Client.PutAsync("api/user/addingContact", new StringContent(JsonSerializer.Serialize(contact).ToString(), Encoding.UTF8, "application/json"));
+                            TempData["testmsg"] = "Solicitud enviada";
                             return RedirectToAction(nameof(Contacts));
-                            
                         }
                         else
                         {
@@ -348,6 +348,67 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             return View("/Views/Chat/ChatType.cshtml");
         }
 
+        public IActionResult AñadirAlGrupo(string IdNuevo)
+        {
+            var contact = Models.Data.Singleton.Instance.opciones.Find(x => x.ID == IdNuevo);
+            Models.Data.Singleton.Instance.opciones.Remove(contact);
+            Models.Data.Singleton.Instance.agregados.Add(contact);
+            return View("/Views/Chat/ConfirmGroup.cshtml", Models.Data.Singleton.Instance.agregados);
+        }
+
+        public IActionResult EliminarAlGrupo(string IdEliminado)
+        {
+            var contact = Models.Data.Singleton.Instance.opciones.Find(x => x.ID == IdEliminado);
+            Models.Data.Singleton.Instance.agregados.Remove(contact);
+            Models.Data.Singleton.Instance.opciones.Add(contact);
+            return View("/Views/Chat/ConfirmGroup.cshtml", Models.Data.Singleton.Instance.agregados);
+        }
+
+        public IActionResult Crear()
+        {
+            if(Models.Data.Singleton.Instance.agregados.Count > 0)
+            {
+                return View("/Views/Chat/ConfirmGroup.cshtml", Models.Data.Singleton.Instance.agregados);
+            }
+            else
+            {
+                TempData["testmsg"] = "No tiene ningún contacto agregado";
+                return View("/Views/Chat/CreateChatG.cshtml", Models.Data.Singleton.Instance.opciones);
+            }
+        }
+
+        public IActionResult AgregarMas()
+        {
+            return View("/Views/Chat/CreateChatG.cshtml", Models.Data.Singleton.Instance.opciones);
+        }
+
+        public async Task<IActionResult> ConfirmarGrupo(IFormCollection collection)
+        {
+            api = new Starter.Starter();
+            Client = api.Start();
+            ChatRoom newChat = new ChatRoom();
+            newChat.Id = ObjectId.GenerateNewId();
+            newChat.Users.Add(HttpContext.Session.GetString(SessionID));
+            foreach(var temp in Models.Data.Singleton.Instance.agregados)
+            {
+                newChat.Users.Add(temp.ID);
+            }
+            newChat.type = 2;
+            newChat.name = collection["groupName"];
+            var json = JsonSerializer.Serialize(newChat);
+            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+            HttpResponseMessage RM4 = await Client.PostAsync("api/user/createChat", content);
+            if (RM4.IsSuccessStatusCode)
+            {
+                return RedirectToAction(nameof(ChatRoom), new { id = await RM4.Content.ReadAsStringAsync() });
+            }
+            else
+            {
+                TempData["testmsg"] = "No se pudo crear el chat";
+                return View("/Views/Chat/ConfirmGroup.cshtml", Models.Data.Singleton.Instance.agregados);
+            }
+        }
+
         public async Task<ActionResult> _ChatType(int type)
         {
             api = new Starter.Starter();
@@ -360,7 +421,9 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             }
             else
             {
-                return View("/Views/Chat/ChatType.cshtml");
+                Models.Data.Singleton.Instance.opciones = currentUser.Contacts;
+                Models.Data.Singleton.Instance.agregados = new List<Contact>();
+                return View("/Views/Chat/CreateChatG.cshtml", Models.Data.Singleton.Instance.opciones);
             }
         }
 
@@ -402,8 +465,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             }
             else
             {
-                var message = await RM4.Content.ReadAsStringAsync();
-                TempData["testmsg"] = "No se pudo crear el chat" + message;
+                TempData["testmsg"] = "No se pudo crear el chat";
                 return View("/Views/Chat/CreateChatP.cshtml", currentUser.Contacts);
             }
         }

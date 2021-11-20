@@ -57,9 +57,10 @@ a {
 
 .text-message {
     color: var(--principal);
-    margin: 0px !important;
+    margin: 0px 0px 0px 15px;
     padding: 0px;
     border: 0px;
+    width: 100%;
 }
 
 .titulo {
@@ -107,8 +108,7 @@ a {
 .mensaje-propio {
     border-radius: 10px;
     border: 1px var(--secundario) solid;
-    margin: 0px !important;
-    background-color: var(--text-gris);
+    background-color: var(--presionado);
     padding: 15px;
 }
 
@@ -205,7 +205,6 @@ a {
 
 .input-label {
     font-variant-caps: titling-caps;
-    width: 20%;
     font-size: 15px;
     padding: 15px;
     border-radius: 10px 0px 0px 10px;
@@ -241,9 +240,15 @@ a.btn-principal:hover {
     text-decoration: none;
 }
 
+.btn-mini{
+    padding: 0px !important;
+    margin: 0px 2px 0px 2px !important;
+    font-size: 10px !important;
+}
+
 .input-text {
     font-variant-caps: titling-caps;
-    width: 80%;
+    min-width: 80%;
     border-radius: 0px 10px 10px 0px;
     border: 1px var(--secundario) solid;
     margin: 10px 0px 10px 0px;

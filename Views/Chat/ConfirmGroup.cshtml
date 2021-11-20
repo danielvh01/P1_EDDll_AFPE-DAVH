@@ -1,0 +1,31 @@
+﻿@model IEnumerable<Contact>
+<nav class="navigation-bar row">
+    <h2 class="text-white col-9 ml-3 p-0 m-0">Contactos</h2>
+    <a class="btn-claro my-0" asp-action="newContact">Añadir contacto</a>
+    <a class="btn-claro my-0" asp-action="ListChat">Regresar</a>
+</nav>
+<div class="row maxheight">
+    <div class="col-6 list-contacts">
+        <h2 class="row mt-5 text-center titulo-lista">Lista de contactos agregados</h2>
+        @foreach (var contact in Model)
+        {
+            <div class="container row request">
+                <h3 class="col-9 item">@contact.Username</h3>
+                <a class="btn-principal marginx padding-btn col-2" href="@Url.Action("EliminarAlGrupo", new { IdEliminado = contact.ID})">Eliminar</a>
+            </div>
+        }
+
+    </div>
+    <div class="col-6 list-contacts">
+        <form asp-action="ConfirmarGrupo" asp-controller="User" class="pt-3 col-6">
+            <div class="row">
+                <label class="input-label" for="groupName">Nomnbre del grupo</label>
+                <input name="groupName" class="input-text" required>
+            </div>
+            <div class="row">
+                <a class="btn-principal ancho-mitad" asp-action="AgregarMas">Agregar más integrantes</a>
+                <input class="btn-principal ancho-mitad" type="submit" value="Confirmar" />
+            </div>
+        </form>
+    </div>
+</div>
