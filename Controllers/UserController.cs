@@ -48,21 +48,30 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             var RM2 = await Client.GetAsync("api/user/chat/" + id);
             ViewBag.ID = id;
             ChatRoom chatRoom = JsonSerializer.Deserialize<ChatRoom>(RM2.Content.ReadAsStringAsync().Result);
-            if(chatRoom.type == 1)
+            
+            var response = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
+            var user = response.Content.ReadAsStringAsync().Result;
+            User currentUser = JsonSerializer.Deserialize<User>(user);
+            ViewBag.ka = currentUser.a;
+            ViewBag.p = chatRoom.p;
+            ViewBag.A = chatRoom.A;
+            ViewBag.B = chatRoom.B;
+            ViewBag.Username = HttpContext.Session.GetString(SessionUsername);
+            if (chatRoom.type == 1)
             {
                 if(chatRoom.Users[0] == HttpContext.Session.GetString(SessionID))
-                {
-                    ViewBag.Username = await Client.GetAsync("api/user/getUsername/" + chatRoom.Users[1]).Result.Content.ReadAsStringAsync();
+                {                    
+                    ViewBag.ChatName = await Client.GetAsync("api/user/getUsername/" + chatRoom.Users[1]).Result.Content.ReadAsStringAsync();
                 }
                 else
-                {
-                    ViewBag.Username = await Client.GetAsync("api/user/getUsername/" + chatRoom.Users[0]).Result.Content.ReadAsStringAsync();
+                {                    
+                    ViewBag.ChatName = await Client.GetAsync("api/user/getUsername/" + chatRoom.Users[0]).Result.Content.ReadAsStringAsync();
                 }
                 
             }
             else
             {
-                ViewBag.Username = chatRoom.name;
+                ViewBag.ChatName = chatRoom.name;
             }
             List<Message> mensajesMostrados = chatRoom.Messages;
             return View("/Views/Chat/Room.cshtml", mensajesMostrados);
@@ -181,14 +190,14 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
                 {
                     mensaje = new Message();
                     mensaje.Id = ObjectId.GenerateNewId();
-                    mensaje.content = cipher.Cipher(GetBytes(message), (int)BigInteger.ModPow(_chat.A, currentuser.a, _chat.p)).ToList();
+                    mensaje.content = cipher.Cipher(GetBytes(message), (int)BigInteger.ModPow(_chat.B, currentuser.a, _chat.p)).ToList();
                     mensaje.UserSender = HttpContext.Session.GetString(SessionUsername);
                 }
                 else
                 {
                     mensaje = new Message();
                     mensaje.Id = ObjectId.GenerateNewId();
-                    mensaje.content = cipher.Cipher(GetBytes(message), (int)BigInteger.ModPow(_chat.B, currentuser.a, _chat.p)).ToList();
+                    mensaje.content = cipher.Cipher(GetBytes(message), (int)BigInteger.ModPow(_chat.A, currentuser.a, _chat.p)).ToList();
                     mensaje.UserSender = HttpContext.Session.GetString(SessionUsername);
                 }
                 await Client.PutAsync("api/user/chat/sendMessage/" + ID, new StringContent(JsonSerializer.Serialize(mensaje).ToString(), Encoding.UTF8, "application/json"));
@@ -251,7 +260,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             if (RM.IsSuccessStatusCode && RM2.IsSuccessStatusCode)
             {
                 User currentUser = JsonSerializer.Deserialize<User>(RM.Content.ReadAsStringAsync().Result);
-                string ID = JsonSerializer.Deserialize<string>(RM2.Content.ReadAsStringAsync().Result);
+                string ID = RM2.Content.ReadAsStringAsync().Result;
                 HttpResponseMessage RM3 = await Client.GetAsync("api/user/" + ID);
                 User User = JsonSerializer.Deserialize<User>(RM3.Content.ReadAsStringAsync().Result);
                 if (currentUser.Contacts.Find(x => x.ID == ID) == null)

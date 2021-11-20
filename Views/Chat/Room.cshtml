@@ -3,16 +3,27 @@
     <h2 class="text-white col-11 ml-3 p-0 m-0">@ViewBag.Chatname</h2>
     <a class="btn-claro my-0">Regresar</a>
 </nav>
+@{ 
+
+    DataStructures.ICipher<int> cipher = new DataStructures.SDES(System.IO.Path.GetDirectoryName(@"Configuration\"));
+    DataStructures.ICipher<int[]> RSACipher = new DataStructures.RSA();
+
+    static string GetString(byte[] bytes)
+    {
+        char[] chars = new char[bytes.Length / sizeof(char)];
+        System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+        return new string(chars);
+    }}
 <div class="mensajes">
     @foreach (var message in Model)
     {
         @if (message.UserSender == ViewBag.Username && message.visible)
         {
-            <div class="mensaje-propio offset-4 col-8">
+            <div class="mensaje-propio offset-4 col-7">
                 <h4 class="row emisor-mensaje">@message.UserSender</h4>
                 @if(message.type == 1)
                 {
-                    <p class="row text-mensaje text-wrap">@message.content</p>
+                    <p class="row text-mensaje text-wrap">@GetString(cipher.Decipher(message.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.B, ViewBag.ka, ViewBag.p)))</p>
                 }
                 else
                 {
@@ -25,11 +36,11 @@
         }
         else
         {
-            <div class="mensaje col-8">
+            <div class="mensaje col-7">
                 <h4 class="row emisor-mensaje">@message.UserSender</h4>
                 @if (message.type == 1)
                 {
-                    <p class="row text-mensaje text-wrap">@message.content</p>
+                    <p class="row text-mensaje text-wrap">@GetString(cipher.Decipher(message.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.A, ViewBag.ka, ViewBag.p)))</p>
                 }
                 else
                 {
