@@ -1,0 +1,40 @@
+﻿@model P1_EDDll_AFPE_DAVH.Models.User
+<nav class="navigation-bar row">
+    <h2 class="text-white col-9 ml-3 p-0 m-0">Contactos</h2>
+    <a class="btn-claro my-0" asp-action="newContact">Añadir contacto</a>
+    <a class="btn-claro my-0" asp-action="ListChat">Regresar</a>
+</nav>
+<div class="row maxheight">
+    <div class="col-6 list-contacts">
+        <h2 class="row mt-5 text-center titulo-lista">Lista de Contactos</h2>
+        @foreach (var contact in Model.Contacts)
+        {
+            <div class="row request">
+                <div class="row"><h3 class="col-12">@contact.Username</h3></div>
+            </div>
+        }
+        @if (Model.Contacts.Count == 0)
+        {
+            <div class="container row request">
+                <h3 class="col-9 item">No tiene contactos agregados</h3>
+            </div>
+        }
+    </div>
+    <div class="col-6 list-requests">
+        <h2 class="row mt-5 text-center titulo-lista">Lista de Solicitudes</h2>
+        @foreach (var request in Model.ConnectionRequests)
+        {
+            <div class="row request">
+                <h3 class="col-8 item">@request.Username</h3>
+                <a class="btn-principal marginx padding-btn" href="@Url.Action("AccceptRequest", request)">Aceptar</a>
+                <a class="btn-principal marginx padding-btn" href="@Url.Action("DenegateRequest", request)">Denegar</a>
+            </div>
+        }
+        @if (Model.ConnectionRequests.Count == 0)
+        {
+            <div class="container row request">
+                <h3 class="col-9 item">No tiene solicitudes pendientes</h3>
+            </div>
+        }
+    </div>
+</div>

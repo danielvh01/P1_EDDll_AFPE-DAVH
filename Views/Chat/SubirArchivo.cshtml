@@ -1,0 +1,16 @@
+﻿@model P1_EDDll_AFPE_DAVH.Models.FileModel
+<nav class="navigation-bar row">
+    <h2 class="text-white col-10 ml-3 p-0 m-0">Subir un archivo</h2>
+    <a class="btn-claro my-0" asp-action="@Url.Action("ChatRoom", new { id = P1_EDDll_AFPE_DAVH.Models.Data.Singleton.Instance.chatID})">Regresar</a>
+</nav>
+<div class="container text-center pt-5 justify-content-center">
+    <h2>Subir un archivo</h2>
+    <form asp-action="_SubirArchivo" asp-controller="User" enctype="multipart/form-data" method="post" class="pt-3 col-8 offset-2">
+        <div class="row">
+            <input asp-for="File" class="input-text">
+        </div>
+        <div class="row">
+            <input class="btn-principal col-12" type="submit" value="Subir archivo" />
+        </div>
+    </form>
+</div>

@@ -1,0 +1,36 @@
+﻿@model P1_EDDll_AFPE_DAVH.Models.Register
+<div class="container text-center pt-5 justify-content-center">
+    <h2>Registro de usuario</h2>
+    <form asp-action="_Register" asp-controller="User" class="pt-3 col-6 offset-3">
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="row">
+            <label class="input-label" asp-for="Username">Usuario</label>
+            <input asp-for="Username" class="input-text" required>
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+        <div class="row">
+            <label class="input-label" asp-for="Password">Contraseña</label>
+            <input type="password" asp-for="Password" class="input-text" required>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="row">
+            <label class="input-label" asp-for="PasswordConfirm">Confirmar Contraseña</label>
+            <input type="password" asp-for="PasswordConfirm" class="input-text" required>
+            <span asp-validation-for="PasswordConfirm" class="text-danger"></span>
+        </div>
+        <div class="row">
+            <a class="btn-principal ancho-mitad" asp-action="_Login">Ya tengo cuenta</a>
+            <input class="btn-principal ancho-mitad" type="submit" value="Registrarme" />
+        </div>
+    </form>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+@if (TempData["testmsg"] != null)
+{
+    <script type="text/javascript">
+       alert("@TempData["testmsg"]");
+    </script>
+}

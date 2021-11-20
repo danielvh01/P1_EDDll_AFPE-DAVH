@@ -11,20 +11,20 @@ namespace API_DataTransfer.Data
     public class User_Collection
     {
         MongoDBR repo = new MongoDBR();
-
+        
         IMongoCollection<User> collection;
 
         //If collection is not created yet, it will create one. Otherwise, will collect the actual one.
 
         public User_Collection(){
-            collection = repo.database.GetCollection<User>("Users");
+            collection = repo.database.GetCollection<User>("Users");            
         }
 
         public async Task AddUsers(User _User){
             await collection.InsertOneAsync(_User);
         }
 
-        public async Task<List<User>> GetUsersList()
+        public async Task<List<User>> GetAllUsers()
         {
             return await collection.FindAsync(new BsonDocument()).Result.ToListAsync();
         }

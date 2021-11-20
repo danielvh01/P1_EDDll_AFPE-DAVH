@@ -6,7 +6,7 @@ using API_DataTransfer.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace API_DataTransfer.Models
+namespace P1_EDDll_AFPE_DAVH.Models
 {
     public class Message
     {
@@ -22,10 +22,10 @@ namespace API_DataTransfer.Models
 
         //Keys for cipher 
         public int k1  { get; set; }
-        public int k2 { get; set; } 
+        public int k2 { get; set; }
+    
 
-
-        public Message()
+    public Message()
         {
             Id = ObjectId.GenerateNewId(); ;
             dateTime = DateTime.Now;

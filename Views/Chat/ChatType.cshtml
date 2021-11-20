@@ -1,0 +1,12 @@
+﻿<nav class="navigation-bar row">
+    <h2 class="text-white col-10 ml-3 p-0 m-0">Nuevo chat</h2>
+    <a class="btn-claro my-0" asp-action="ListChat">Regresar</a>
+</nav>
+
+<div class="container">
+    <h3 class="row text-center">Seleccione el tipo de chat que desea crear.</h3>
+    <div class="row col-8 offset-2">
+        <a class="btn-principal col-3" href="@Url.Action("_ChatType", "User", new { type = 1 })">Individual</a>
+        <a class="btn-principal col-3" href="@Url.Action("_ChatType","User", new { type = 2 })">Grupal</a>
+    </div>
+</div>

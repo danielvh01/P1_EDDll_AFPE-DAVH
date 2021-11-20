@@ -1,0 +1,23 @@
+﻿<nav class="navigation-bar row">
+    <h2 class="text-white col-10 ml-3 p-0 m-0">Envio de solicitudes</h2>
+    <a class="btn-claro my-0" asp-action="Contacts">Regresar</a>
+</nav>
+<div class="container text-center pt-5 justify-content-center">
+    <h2>Enviar solicitud de contacto</h2>
+    <form asp-action="newContact" asp-controller="User" class="pt-3 col-6 offset-3">
+        <div class="row">
+            <label class="input-label" for="Username">Usuario</label>
+            <input name="Username" class="input-text" required>
+        </div>
+        <div class="row">
+            <input class="btn-principal" type="submit" value="Enviar solicitud" />
+        </div>
+    </form>
+</div>
+
+@if (TempData["testmsg"] != null)
+{
+    <script type="text/javascript">
+       alert("@TempData["testmsg"]");
+    </script>
+}

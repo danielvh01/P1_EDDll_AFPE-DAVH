@@ -1,6 +1,15 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+:root {
+    --principal: #282828;
+    --secundario: #DDDDDD;
+    --blanco: #FFFFFF;
+    --negro: #000000;
+    --text-gris: #666666;
+    --presionado: #D9D9D9;
+}
+
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -22,6 +31,257 @@ a {
   color: #fff;
   background-color: #1b6ec2;
   border-color: #1861ac;
+}
+
+.footer-emisor {
+    background-color: var(--secundario);
+    padding: 15px;
+    margin: 0px !important;
+    border: 0px;
+    width: 100%;
+}
+
+.icon-btn {
+    color: var(--text-gris);
+    margin: 0px !important;
+    padding: 0px;
+    border: 0px;
+}
+
+.emisor-mensaje {
+    color: var(--principal);
+    margin: 0px !important;
+    padding: 0px;
+    border: 0px;
+}
+
+.text-message {
+    color: var(--principal);
+    margin: 0px 0px 0px 15px;
+    padding: 0px;
+    border: 0px;
+    width: 100%;
+}
+
+.titulo {
+    color: var(--principal);
+    margin: 0px !important;
+    padding: 0px;
+    border: 0px;
+}
+
+.icon-btn:hover {
+    color: var(--text-gris);
+    margin: 0px !important;
+    padding: 0px;
+    border: 1px solid var(--text-gris);
+    cursor: pointer;
+}
+.icon-btn:active {
+    color: var(--text-gris);
+    background-color: var(--presionado);
+    margin: 0px !important;
+    padding: 0px;
+    border: 1px solid var(--text-gris);
+    cursor: pointer;
+}
+
+.mensajes {
+    width: 100%;
+    height: 500px;
+    padding: 15px;
+    margin: 0px !important;
+    border: 0px;
+    background-color: var(--blanco);
+    overflow-y: scroll;
+    overflow-x: no-display;
+}
+
+.mensaje {
+    border-radius: 10px;
+    border: 1px var(--secundario) solid;
+    background-color: var(--blanco);
+    padding: 15px;
+    margin: 0px 0px 10px 0px !important;
+}
+
+.mensaje-propio {
+    border-radius: 10px;
+    border: 1px var(--secundario) solid;
+    background-color: var(--presionado);
+    padding: 15px;
+    margin: 0px 0px 10px 0px;
+}
+
+.max-width{
+    width: 90%;
+}
+
+.input-messagge {
+    border-radius: 10px;
+    border: 1px var(--secundario) solid;
+    margin: 0px !important;
+    background-color: var(--blanco);
+    color: var(--principal);
+    font-size: 15px;
+    padding: 15px;
+}
+
+.btn-principal {
+    font-variant-caps: titling-caps;
+    font-size: 15px;
+    padding: 15px;
+    background-color: var(--principal);
+    border-radius: 10px;
+    border: 0px;
+    margin: 10px 5px;
+    color: var(--blanco);
+}
+
+.ancho-mitad{
+    width: 48%;
+}
+
+.marginx{
+   margin: 0px 5px 0px 5px !important;
+}
+
+.padding-btn{
+    padding: 5px 15px 5px 15px !important;
+}
+
+
+.maxheight {
+    min-height: 585px;
+    margin: 0px !important;
+    padding: 0px;
+    border: 0px;
+}
+
+.titulo-lista {
+    margin: 0px !important;
+    padding: 0px;
+    border: 0px;
+}
+
+.chat-item {
+    color: var(--negro);
+    padding: 25px;
+    margin: 0px !important;
+    border-bottom: 1px solid var(--secundario);
+    width: 100%;
+    font-size: 20px;
+}
+
+.list-contacts{
+    border-right: 1px var(--principal) solid;
+}
+.list-requests {
+    border-left: 1px var(--principal) solid;
+}
+
+.chat-item:hover {
+    color: var(--negro);
+    text-decoration: none;
+}
+
+.btn-claro {
+    font-variant-caps: titling-caps;
+    font-size: 15px;
+    padding: 15px;
+    background-color: var(--blanco);
+    border-radius: 10px;
+    border: 0px;
+    margin: 10px 5px;
+    color: var(--principal);
+}
+
+.btn-claro:hover {
+    color: var(--principal);
+    text-decoration:none;
+}
+
+.navigation-bar {
+    background-color: var(--principal);
+    margin: 0px;
+    border: 0px;
+    padding: 15px;
+}
+
+.input-label {
+    font-variant-caps: titling-caps;
+    font-size: 15px;
+    padding: 15px;
+    border-radius: 10px 0px 0px 10px;
+    border: 0px;
+    margin: 10px 0px 10px 0px;
+    background-color: var(--secundario);
+    color: var(--principal);
+    text-wrap: avoid;
+}
+
+.request {
+    padding: 25px;
+    margin: 0px !important;
+    width: 100%;
+    border-bottom: 1px solid var(--secundario);
+}
+
+.form{
+    margin: 0px 0px 0px 10px !important;
+    padding: 0px;
+}
+
+.form-archivo
+{
+    width: 10%;
+}
+
+.search-text {
+    font-variant-caps: titling-caps;
+    min-width: 60%;
+    border-radius: 10px;
+    border: 1px var(--secundario) solid;
+    margin: 0px;
+    background-color: var(--blanco);
+    color: var(--principal);
+    font-size: 15px;
+    padding: 15px;
+}
+
+.item {
+    color: var(--principal);
+    margin: 0px !important;
+    width: 100%;
+    font-size: 20px;
+}
+
+a.btn-principal:hover {
+    color: var(--blanco);
+    text-decoration: none;
+}
+
+.btn-principal a:hover {
+    color: var(--blanco);
+    text-decoration: none;
+}
+
+.btn-mini {
+    padding: 6px 0px 0px 0px !important;
+    margin: 0px 2px 0px 2px !important;
+    font-size: 10px !important;
+}
+
+.input-text {
+    font-variant-caps: titling-caps;
+    min-width: 80%;
+    border-radius: 0px 10px 10px 0px;
+    border: 1px var(--secundario) solid;
+    margin: 10px 0px 10px 0px;
+    background-color: var(--blanco);
+    color: var(--principal);
+    font-size: 15px;
+    padding: 15px;
 }
 
 /* Sticky footer styles
@@ -50,6 +310,9 @@ button.accept-policy {
   font-size: 1rem;
   line-height: inherit;
 }
+
+.formgroup 
+
 
 /* Sticky footer styles
 -------------------------------------------------- */
