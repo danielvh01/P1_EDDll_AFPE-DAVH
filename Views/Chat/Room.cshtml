@@ -2,7 +2,7 @@
 <nav class="navigation-bar row">
     <h2 class="text-white col-10 ml-3 p-0 m-0">@ViewBag.Chatname</h2>
     <a class="btn-claro my-0" href="@Url.Action("ChatRoom", new { id = ViewBag.ID })">Refrescar</a>
-    <a class="btn-claro my-0">Regresar</a>
+    <a class="btn-claro my-0" asp-action="ListChat">Regresar</a>
 </nav>
 @{ 
 
@@ -19,44 +19,43 @@
     @foreach (var message in Model)
     {
         int[] keys = { message.k1, message.k2 };
-        @if (message.UserSender == ViewBag.Username && message.visible)
+        @if (message.UserSender == ViewBag.Username)
         {
-            <div class="mensaje-propio offset-4 col-7">
-                <div class="row">
-                    <h4 class="row emisor-mensaje">@message.UserSender</h4>
-                    <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarT", new { id = message.Id.ToString()})">Elimnar para todos</a>
-                    <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarM", new { id = message.Id.ToString()})">Elimnar para mí</a>
-                </div>
-                @if(message.type == 1)
-                {
-                    <p class="row text-mensaje text-wrap">
-                        @if (ViewBag.Type == 1)
-                        {
-                            @GetString(cipher.Decipher(message.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.B, ViewBag.ka, ViewBag.p)))
-                        }
-                        else
-                        {
-                            @GetString(RSACipher.Decipher(message.content.ToArray(), keys))
-                        }
-                    </p>
-                }
-                else
-                {
+            @if (message.visible)
+            {
+                <div class="mensaje-propio offset-4 col-7">
                     <div class="row">
-                        <h3 class="col-8 titulo">@message.title</h3>
-                        <button class="col-4 icon-btn"></button>
+                        <h4 class="row emisor-mensaje">@message.UserSender</h4>
+                        <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarT", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Elimnar para todos</a>
+                        <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarM", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Elimnar para mí</a>
                     </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="mensaje col-7">
-                <div class="row">
-                    <h4 class="row emisor-mensaje">@message.UserSender</h4>
-                    <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarT", new { id = message.Id.ToString()})">Elimnar para todos</a>
-                    <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarM", new { id = message.Id.ToString()})">Elimnar para mí</a>
+                    @if (message.type == 1)
+                    {
+                        <p class="row text-mensaje text-wrap">
+                            @if (ViewBag.Type == 1)
+                            {
+                                @GetString(cipher.Decipher(message.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.B, ViewBag.ka, ViewBag.p)))
+                            }
+                            else
+                            {
+                                @GetString(RSACipher.Decipher(message.content.ToArray(), keys))
+                            }
+                        </p>
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <h3 class="col-8 titulo">@message.title</h3>
+                            <button class="col-4 icon-btn"></button>
+                        </div>
+                    }
                 </div>
+                }
+            }
+            else
+            {
+            <div class="mensaje col-7">
+                <h4 class="row emisor-mensaje">@message.UserSender</h4>
                 @if (message.type == 1)
                 {
                     <p class="row text-mensaje text-wrap">

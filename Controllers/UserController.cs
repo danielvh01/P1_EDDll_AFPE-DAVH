@@ -48,7 +48,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             var RM2 = await Client.GetAsync("api/user/chat/" + id);
             ViewBag.ID = id;
             ChatRoom chatRoom = JsonSerializer.Deserialize<ChatRoom>(RM2.Content.ReadAsStringAsync().Result);
-            
+            ViewBag.Type = chatRoom.type;
             var response = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
             var user = response.Content.ReadAsStringAsync().Result;
             User currentUser = JsonSerializer.Deserialize<User>(user);
@@ -73,8 +73,29 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             {
                 ViewBag.ChatName = chatRoom.name;
             }
-            List<Message> mensajesMostrados = chatRoom.Messages;
-            return View("/Views/Chat/Room.cshtml", mensajesMostrados);
+            return View("/Views/Chat/Room.cshtml", chatRoom.Messages);
+        }
+
+        public async Task<IActionResult> EliminarT(string id, string chatId)
+        {
+            api = new Starter.Starter();
+            Client = api.Start();
+            var RM2 = await Client.GetAsync("api/user/chat/" + chatId);
+            ChatRoom chatRoom = JsonSerializer.Deserialize<ChatRoom>(RM2.Content.ReadAsStringAsync().Result);
+            chatRoom.Messages.Remove(chatRoom.Messages.Find(x => x.dateTime.ToString() + x.dateTime.Millisecond.ToString() == id));
+            await Client.PutAsync("api/user/chat/" + chatId, new StringContent(JsonSerializer.Serialize(chatRoom).ToString(), Encoding.UTF8, "application/json"));
+            return RedirectToAction(nameof(ChatRoom), new { id = chatId });
+        }
+
+        public async Task<IActionResult> EliminarM(string id, string chatId)
+        {
+            api = new Starter.Starter();
+            Client = api.Start();
+            var RM2 = await Client.GetAsync("api/user/chat/" + chatId);
+            ChatRoom chatRoom = JsonSerializer.Deserialize<ChatRoom>(RM2.Content.ReadAsStringAsync().Result);
+            chatRoom.Messages.Find(x => x.dateTime.ToString() + x.dateTime.Millisecond.ToString() == id).visible = false;
+            await Client.PutAsync("api/user/chat/" + chatId, new StringContent(JsonSerializer.Serialize(chatRoom).ToString(), Encoding.UTF8, "application/json"));
+            return RedirectToAction(nameof(ChatRoom), new { id = chatId });
         }
 
         // GET: UserController/Create
