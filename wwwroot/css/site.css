@@ -100,9 +100,9 @@ a {
 .mensaje {
     border-radius: 10px;
     border: 1px var(--secundario) solid;
-    margin: 0px !important;
     background-color: var(--blanco);
     padding: 15px;
+    margin: 0px 0px 10px 0px !important;
 }
 
 .mensaje-propio {
@@ -110,6 +110,11 @@ a {
     border: 1px var(--secundario) solid;
     background-color: var(--presionado);
     padding: 15px;
+    margin: 0px 0px 10px 0px;
+}
+
+.max-width{
+    width: 90%;
 }
 
 .input-messagge {
@@ -223,13 +228,18 @@ a {
 }
 
 .form{
-    margin: 0px 5px 0px 0px;
+    margin: 0px 0px 0px 10px !important;
     padding: 0px;
+}
+
+.form-archivo
+{
+    width: 10%;
 }
 
 .search-text {
     font-variant-caps: titling-caps;
-    min-width: 80%;
+    min-width: 60%;
     border-radius: 10px;
     border: 1px var(--secundario) solid;
     margin: 0px;
@@ -256,8 +266,8 @@ a.btn-principal:hover {
     text-decoration: none;
 }
 
-.btn-mini{
-    padding: 0px !important;
+.btn-mini {
+    padding: 6px 0px 0px 0px !important;
     margin: 0px 2px 0px 2px !important;
     font-size: 10px !important;
 }

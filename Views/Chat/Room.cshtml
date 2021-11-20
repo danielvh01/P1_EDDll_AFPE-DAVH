@@ -2,11 +2,10 @@
 <nav class="navigation-bar row">
     <h2 class="text-white col-6 ml-3 p-0 m-0">@ViewBag.Chatname</h2>
     <form asp-action="Buscar" class="row form">
-        <input type="hidden" name="id" value="ViewBag.ID"/>
         <input name="termino" class="search-text" type="search" required>
         <button class="btn-claro my-0 mr-1" type="submit">Buscar</button>
     </form>
-    <a class="btn-claro my-0" href="@Url.Action("ChatRoom", new { id = ViewBag.ID })">Refrescar</a>
+    <a class="btn-claro my-0" href="@Url.Action("ChatRoom", new { id = P1_EDDll_AFPE_DAVH.Models.Data.Singleton.Instance.chatID })">Refrescar</a>
     <a class="btn-claro my-0" asp-action="ListChat">Regresar</a>
 </nav>
 @{ 
@@ -30,9 +29,9 @@
             {
                 <div class="mensaje-propio offset-4 col-7">
                     <div class="row">
-                        <h4 class="row emisor-mensaje">@message.UserSender</h4>
-                        <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarT", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Elimnar para todos</a>
-                        <a class="col-4 btn-claro btn-mini" href="@Url.Action("EliminarM", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Elimnar para mí</a>
+                        <h4 class="col-7 emisor-mensaje">@message.UserSender</h4>
+                        <a class="col-2 btn-claro btn-mini text-center" href="@Url.Action("EliminarT", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Elimnar para todos</a>
+                        <a class="col-2 btn-claro btn-mini text-center" href="@Url.Action("EliminarM", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Elimnar para mí</a>
                     </div>
                     @if (message.type == 1)
                     {
@@ -51,7 +50,7 @@
                     {
                         <div class="row">
                             <h3 class="col-8 titulo">@message.title</h3>
-                            <button class="col-4 icon-btn" href="@Url.Action("Download", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Descargar</button>
+                            <a class="col-4 btn-principal" href="@Url.Action("Download", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Descargar</a>
                         </div>
                     }
                 </div>
@@ -78,21 +77,18 @@
                 {
                     <div class="row">
                         <h3 class="col-8 titulo">@message.title</h3>
-                        <button class="col-4 icon-btn" href="@Url.Action("Download", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Descargar</button>
+                        <a class="col-4 btn-principal" href="@Url.Action("Download", new { id = message.dateTime.ToString() + message.dateTime.Millisecond.ToString(), chatId = ViewBag.ID })">Descargar</a>
                     </div>
                 }
             </div>
         }
     }
-    @if (Model.Count == 0)
-    {
-        <h4 class="row emisor-mensaje">No se encontraron resultados</h4>
-    }
 </div>
-<form asp-action="SendMessage" class="footer-emisor row">
-    <button class="col-1 icon-btn" href="@Url.Action("SubirArchivo", new { id = ViewBag.ID})">Subir Archivo</button>
-    <input name="Id" value="@ViewBag.ID" type="hidden"/>
-    <input class="col-10 input-messagge" name="MessageText" type="text" placeholder="Escribe aquí tu mensaje" />
-    <button class="col-1 icon-btn" type="submit">Enviar</button>
-</form>
+<div class="row footer-emisor">
+        <a class="btn-principal" href="@Url.Action("SubirArchivo", new { id = ViewBag.ID})">Subir Archivo</a>
+    <form asp-action="SendMessage" class="max-width">
+        <input class="col-10 input-messagge" name="MessageText" type="text" placeholder="Escribe aquí tu mensaje" />
+        <button class="col-1 btn-principal" type="submit">Enviar</button>
+    </form>
+</div>
 

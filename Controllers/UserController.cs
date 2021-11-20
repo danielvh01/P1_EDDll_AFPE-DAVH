@@ -44,45 +44,57 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         {
             api = new Starter.Starter();
             Client = api.Start();
-            var RM2 = await Client.GetAsync("api/user/chat/" + collecction["id"]);
+            var RM2 = await Client.GetAsync("api/user/chat/" + Models.Data.Singleton.Instance.chatID);
             ChatRoom chatRoom = JsonSerializer.Deserialize<ChatRoom>(RM2.Content.ReadAsStringAsync().Result);
-
+            ViewBag.Type = chatRoom.type;
+            ViewBag.p = chatRoom.p;
+            ViewBag.A = chatRoom.A;
+            ViewBag.B = chatRoom.B;
+            ViewBag.Username = HttpContext.Session.GetString(SessionUsername);
             HttpResponseMessage RM = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
             User currentuser = JsonSerializer.Deserialize<User>(RM.Content.ReadAsStringAsync().Result);
+            ViewBag.ka = currentuser.a;
             List<Message> messages = new List<Message>();
             foreach(var mensaje in chatRoom.Messages)
             {
                 string content;
-                if(chatRoom.type == 1)
+                if (mensaje.type == 1)
                 {
-                    ICipher<int> cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
-                    if(chatRoom.Users[0] == HttpContext.Session.GetString(SessionUsername))
+                    if (chatRoom.type == 1)
                     {
-                        content = GetString(cipher.Decipher(mensaje.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.B, currentuser.a, ViewBag.p)));
+                        ICipher<int> cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
+                        if (chatRoom.Users[0] == HttpContext.Session.GetString(SessionUsername))
+                        {
+                            content = GetString(cipher.Decipher(mensaje.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(chatRoom.B, currentuser.a, chatRoom.p)));
+                        }
+                        else
+                        {
+                            content = GetString(cipher.Decipher(mensaje.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(chatRoom.A, currentuser.a, chatRoom.p)));
+                        }
                     }
                     else
                     {
-                        content = GetString(cipher.Decipher(mensaje.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.A, currentuser.a, ViewBag.p)));
+                        ICipher<int[]> cipher = new RSA();
+                        int[] keys = { mensaje.k1, mensaje.k2 };
+                        content = GetString(cipher.Decipher(mensaje.content.ToArray(), keys));
                     }
+                    
                 }
                 else
                 {
-                    ICipher<int[]> cipher = new RSA();
-                    int[] keys = { mensaje.k1, mensaje.k2 };
-                    content = GetString(cipher.Decipher(mensaje.content.ToArray(), keys));
+                    content = mensaje.title;
                 }
-                if(content.Contains(collecction["termino"]))
+                if (content.Contains(collecction["termino"]))
                 {
                     messages.Add(mensaje);
                 }
             }
-            ViewBag.ID = collecction["id"];
             return View("/Views/Chat/SearchResult.cshtml", messages);
         }
 
         public ActionResult SubirArchivo(string id)
         {
-            ViewBag.ID = id;
+            Models.Data.Singleton.Instance.chatID = id;
             return View("/Views/Chat/SubirArchivo.cshtml");
         }
 
@@ -103,7 +115,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             api = new Starter.Starter();
             Client = api.Start();
             string sessionUser = HttpContext.Session.GetString(SessionID);
-            var ID = ViewBag.ID;
+            var ID = Models.Data.Singleton.Instance.chatID;
             HttpResponseMessage RM = await Client.GetAsync("api/user/chat/" + ID);
 
 
@@ -134,6 +146,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             Client = api.Start();
             var RM2 = await Client.GetAsync("api/user/chat/" + id);
             ViewBag.ID = id;
+            Models.Data.Singleton.Instance.chatID = id;
             ChatRoom chatRoom = JsonSerializer.Deserialize<ChatRoom>(RM2.Content.ReadAsStringAsync().Result);
             ViewBag.Type = chatRoom.type;
             var response = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
@@ -278,7 +291,7 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             api = new Starter.Starter();
             Client = api.Start();
             string sessionUser = HttpContext.Session.GetString(SessionID);
-            var ID = collection["Id"];
+            var ID = Models.Data.Singleton.Instance.chatID;
             var message = collection["MessageText"];
             HttpResponseMessage RM = await Client.GetAsync("api/user/chat/" + ID);
 

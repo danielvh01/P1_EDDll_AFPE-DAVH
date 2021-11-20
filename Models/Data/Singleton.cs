@@ -17,6 +17,7 @@ namespace P1_EDDll_AFPE_DAVH.Models.Data
         private readonly static Singleton _instance = new Singleton();
         public List<Contact> opciones = new List<Contact>();
         public List<Contact> agregados = new List<Contact>();
+        public string chatID = "";
         public static Singleton Instance
         {
             get
