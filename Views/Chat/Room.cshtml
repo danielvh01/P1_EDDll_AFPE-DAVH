@@ -42,11 +42,12 @@
         }
     }
 </div>
-<div class="footer-emisor row">
+<form asp-action="SendMessage" class="footer-emisor row">
     <button class="col-1 icon-btn">Subir Archivo</button>
-    <input class="col-10 input-messagge" type="text" placeholder="Escribe aquí tu mensaje"/>
-    <button class="col-1 icon-btn">Enviar</button>
-</div>
+    <input name="Id" value="@ViewBag.ID" type="hidden"/>
+    <input class="col-10 input-messagge" name="MessageText" type="text" placeholder="Escribe aquí tu mensaje" />
+    <button class="col-1 icon-btn" type="submit">Enviar</button>
+</form>
 
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
 

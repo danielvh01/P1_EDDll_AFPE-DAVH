@@ -41,9 +41,30 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         }
 
         // GET: UserController/Details/5
-        public ActionResult ChatRoom(string id)
+        public async Task<ActionResult> ChatRoom(string id)
         {
-            List<Message> mensajesMostrados = new List<Message>();
+            api = new Starter.Starter();
+            Client = api.Start();
+            var RM2 = await Client.GetAsync("api/user/chat/" + id);
+            ViewBag.ID = id;
+            ChatRoom chatRoom = JsonSerializer.Deserialize<ChatRoom>(RM2.Content.ReadAsStringAsync().Result);
+            if(chatRoom.type == 1)
+            {
+                if(chatRoom.Users[0] == HttpContext.Session.GetString(SessionID))
+                {
+                    ViewBag.Username = await Client.GetAsync("api/user/getUsername/" + chatRoom.Users[1]).Result.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    ViewBag.Username = await Client.GetAsync("api/user/getUsername/" + chatRoom.Users[0]).Result.Content.ReadAsStringAsync();
+                }
+                
+            }
+            else
+            {
+                ViewBag.Username = chatRoom.name;
+            }
+            List<Message> mensajesMostrados = chatRoom.Messages;
             return View("/Views/Chat/Room.cshtml", mensajesMostrados);
         }
 
@@ -134,12 +155,15 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             }
         }
 
-        public async Task<IActionResult> SendMessage(string ID,string message)
+        [HttpPost]
+        public async Task<IActionResult> SendMessage(IFormCollection collection)
         {
             api = new Starter.Starter();
             Client = api.Start();
             string sessionUser = HttpContext.Session.GetString(SessionID);
-            HttpResponseMessage RM = await Client.GetAsync("api/user/chatRoom/" + ID);
+            var ID = collection["Id"];
+            var message = collection["MessageText"];
+            HttpResponseMessage RM = await Client.GetAsync("api/user/chat/" + ID);
 
             HttpResponseMessage RM2 = await Client.GetAsync("api/user/" + sessionUser);
             User currentuser = JsonSerializer.Deserialize<User>(RM2.Content.ReadAsStringAsync().Result);
@@ -149,27 +173,37 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             
             if (_chat.type == 1)
             {
-                SDES cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
+                ICipher<int> cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
                 Message mensaje;
-                
+
                 //Como llave sdes mandar la que se genera de diffie helman entre los usuarios
                 if (_chat.Users.FindIndex(x => x == sessionUser) == 0)
                 {
-                    mensaje = new Message(ObjectId.GenerateNewId(), cipher.Cipher(GetBytes(message), (int)BigInteger.ModPow(_chat.A, currentuser.a, _chat.p)).ToList(), 1, sessionUser, 0, 0);                    
+                    mensaje = new Message();
+                    mensaje.Id = ObjectId.GenerateNewId();
+                    mensaje.content = cipher.Cipher(GetBytes(message), (int)BigInteger.ModPow(_chat.A, currentuser.a, _chat.p)).ToList();
+                    mensaje.UserSender = HttpContext.Session.GetString(SessionUsername);
                 }
                 else
                 {
-                    mensaje = new Message(ObjectId.GenerateNewId(), cipher.Cipher(GetBytes(message), (int)BigInteger.ModPow(_chat.B, currentuser.a, _chat.p)).ToList(), 1, sessionUser, 0, 0);
+                    mensaje = new Message();
+                    mensaje.Id = ObjectId.GenerateNewId();
+                    mensaje.content = cipher.Cipher(GetBytes(message), (int)BigInteger.ModPow(_chat.B, currentuser.a, _chat.p)).ToList();
+                    mensaje.UserSender = HttpContext.Session.GetString(SessionUsername);
                 }
-                _chat.Messages.Add(mensaje);
+                await Client.PutAsync("api/user/chat/sendMessage/" + ID, new StringContent(JsonSerializer.Serialize(mensaje).ToString(), Encoding.UTF8, "application/json"));
             }
             else
             {                
                 RSA groupCipher = new RSA();
                 int[] keys = { currentuser.n, currentuser.e };
-                Message mensaje = new Message(ObjectId.GenerateNewId(), groupCipher.Cipher(GetBytes(message), keys).ToList(),1, sessionUser,currentuser.n,currentuser.d);
-                _chat.Messages.Add(mensaje);
-                
+                Message mensaje = new Message();
+                mensaje.Id = ObjectId.GenerateNewId();
+                mensaje.content = groupCipher.Cipher(GetBytes(message), keys).ToList();
+                mensaje.UserSender = HttpContext.Session.GetString(SessionUsername);
+                mensaje.k1 = currentuser.n;
+                mensaje.k2 = currentuser.d;
+
             }
             var json = JsonSerializer.Serialize(_chat);
             var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");

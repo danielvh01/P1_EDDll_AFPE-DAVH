@@ -25,16 +25,16 @@ namespace P1_EDDll_AFPE_DAVH.Models
         public int k2 { get; set; }
     
 
-    public Message(ObjectId _Id, List<byte> _content, int _type , string _userSender, int _k1, int _k2)
+    public Message()
         {
-            Id = _Id;
+            Id = ObjectId.GenerateNewId(); ;
             dateTime = DateTime.Now;
             visible = true;
-            content = _content;
-            type = _type;
-            UserSender = _userSender;
-            k1 = _k1;
-            k2 = _k2;
+            content = new List<byte>();
+            type = 1;
+            UserSender = "";
+            k1 = 1;
+            k2 = 1;
             title = "";
         }
 

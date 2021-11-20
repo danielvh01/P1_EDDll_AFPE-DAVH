@@ -78,7 +78,7 @@ namespace API_DataTransfer.Controllers
             string JsonObj = Juser.ToString();
             Login user = JsonSerializer.Deserialize<Login>(JsonObj);
             List<User> UserRegistry = usersDB.GetAllUsers().Result.ToList();
-            SDES cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
+            ICipher<int> cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
             for (int i = 0; i < UserRegistry.Count; i++)
             {
                 User temp = UserRegistry.ElementAt(i);
@@ -208,6 +208,21 @@ namespace API_DataTransfer.Controllers
             return Ok();
         }
 
+        [HttpPut("chat/sendMessage/{ID}")]
+        public async Task<IActionResult> SendMessage([FromRoute] string id, [FromBody] JsonElement JMessage)
+        {
+
+            Message _message = JsonSerializer.Deserialize<Message>(JMessage.ToString());
+            if (_message == null)
+            {
+                return BadRequest();
+            }
+            _message.Id = MongoDB.Bson.ObjectId.GenerateNewId();
+            var _chat = await chatRoomDB.GetChatFromID(id);
+            _chat.Messages.Add(_message);
+            await chatRoomDB.PutChatRoom(_chat);
+            return Ok();
+        }
 
         [HttpGet("chat/{ID}")]
         public async Task<IActionResult> GetSpecifiedChat([FromRoute] string ID)
