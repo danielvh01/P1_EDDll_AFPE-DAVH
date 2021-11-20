@@ -16,6 +16,7 @@ namespace API_DataTransfer.Models
         public bool visible  { get; set; }
         public List<byte> content { get; set; }
         public int type { get; set; }
+
         public string title { get; set; }
         public string UserSender { get; set; }
 
@@ -24,17 +25,17 @@ namespace API_DataTransfer.Models
         public int k2 { get; set; }
     
 
-    public Message(ObjectId _Id, List<byte> _content, int _type , string _idSender, int _k1, int _k2)
+    public Message(ObjectId _Id, List<byte> _content, int _type , string _userSender, int _k1, int _k2)
         {
             Id = _Id;
             dateTime = DateTime.Now;
             visible = true;
             content = _content;
             type = _type;
-            UserSender = _idSender;
+            UserSender = _userSender;
             k1 = _k1;
             k2 = _k2;
-
+            title = "";
         }
 
         public void DeleteForMe()
