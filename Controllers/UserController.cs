@@ -40,6 +40,54 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             return View("/Views/Login/_Login.cshtml", new Login());
         }
 
+        public ActionResult SubirArchivo(string id)
+        {
+            ViewBag.ID = id;
+            return View("/Views/Chat/SubirArchivo.cshtml");
+        }
+
+        public async Task<IActionResult> Download(string id, string chatId)
+        {
+            api = new Starter.Starter();
+            Client = api.Start();
+            var RM2 = await Client.GetAsync("api/user/chat/" + chatId);
+            ChatRoom chatRoom = JsonSerializer.Deserialize<ChatRoom>(RM2.Content.ReadAsStringAsync().Result);
+            var mensaje = chatRoom.Messages.Find(x => x.dateTime.ToString() + x.dateTime.Millisecond.ToString() == id);
+            ILZWCompressor compressor = new LZW();
+            byte[] content = compressor.Decompression(mensaje.content.ToArray());
+            return File(content, "application/text", mensaje.title);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> _SubirArchivo(FileModel model)
+        {
+            api = new Starter.Starter();
+            Client = api.Start();
+            string sessionUser = HttpContext.Session.GetString(SessionID);
+            var ID = ViewBag.ID;
+            HttpResponseMessage RM = await Client.GetAsync("api/user/chat/" + ID);
+
+
+            var request = RM.Content.ReadAsStringAsync().Result;
+            var _chat = JsonSerializer.Deserialize<ChatRoom>(request);
+
+            ILZWCompressor compressor = new LZW();
+            byte[] content;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                model.File.CopyTo(stream);
+                content = stream.ToArray();
+            }
+                Message mensaje = new Message();
+            mensaje.Id = ObjectId.GenerateNewId();
+            mensaje.UserSender = HttpContext.Session.GetString(SessionUsername);
+            mensaje.content = compressor.Compress(content).ToList();
+            mensaje.type = 2;
+            mensaje.title = model.File.FileName;
+            await Client.PutAsync("api/user/chat/sendMessage/" + ID, new StringContent(JsonSerializer.Serialize(mensaje).ToString(), Encoding.UTF8, "application/json"));
+            return RedirectToAction(nameof(ChatRoom), new { id = ID });
+        }
+
         // GET: UserController/Details/5
         public async Task<ActionResult> ChatRoom(string id)
         {
