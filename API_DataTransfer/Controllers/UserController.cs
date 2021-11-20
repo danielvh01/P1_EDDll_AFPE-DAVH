@@ -46,12 +46,12 @@ namespace API_DataTransfer.Controllers
         [HttpGet("getByUser/{Username}")]
         public async Task<IActionResult> GetByUser([FromRoute] string Username)
         {
-            var FindUser = usersDB.GetAllUsers().Result.ToList().Find(x => x.Username == Username).Id;
+            var FindUser = usersDB.GetAllUsers().Result.ToList().Find(x => x.Username == Username);
             if (FindUser == null)
             {
                 return BadRequest();
             }
-            return Ok(JsonSerializer.Serialize(FindUser.ToString()));
+            return Ok(FindUser.Id.ToString());
         }
 
         [HttpPost]
