@@ -17,7 +17,7 @@ namespace API_DataTransfer.Models
         public string Password { get; set; }
         public List<Contact> Contacts { get; set; }
         public List<Contact> ConnectionRequests { get; set; }
-        public List<Chat> Chats { get; set; }
+        public List<string> Chats { get; set; }
         public int a { get; set; }
         public int n { get; set; }
         public int d { get; set;}        
@@ -28,19 +28,19 @@ namespace API_DataTransfer.Models
             Random rnd = new Random();
             Contacts = new List<Contact>();
             ConnectionRequests = new List<Contact>();
-            Chats = new List<Chat>();
+            Chats = new List<string>();
             a = rnd.Next(2,100);
 
-            int p = rnd.Next(16);
+            int p = rnd.Next(16,100);
             while (!IsPrime(p))
             {
                 p = rnd.Next(16);
             }
-
-            int q = rnd.Next(16);
+            
+            int q = rnd.Next(16, 100);
             while (!IsPrime(q))
             {
-                q = rnd.Next(16);
+                q = rnd.Next(16, 100);
             }
             RSA RSACipher = new RSA();
 

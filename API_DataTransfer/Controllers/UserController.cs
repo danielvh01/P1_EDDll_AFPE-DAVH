@@ -79,12 +79,10 @@ namespace API_DataTransfer.Controllers
             Login user = JsonSerializer.Deserialize<Login>(JsonObj);
             List<User> UserRegistry = usersDB.GetAllUsers().Result.ToList();
             SDES cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
-            byte[] PasswordBytes = GetBytes(user.Password);
-            string passwordCiphered = GetString(cipher.Cipher(PasswordBytes, 8));
             for (int i = 0; i < UserRegistry.Count; i++)
             {
                 User temp = UserRegistry.ElementAt(i);
-                if (temp.Username == user.Username && temp.Password == passwordCiphered)
+                if (temp.Username == user.Username && GetString(cipher.Decipher(GetBytes(temp.Password), 8)) == user.Password)
                 {
                     return Ok(temp.Id.ToString());
                 }
@@ -184,9 +182,16 @@ namespace API_DataTransfer.Controllers
         [HttpPost("createChat")]
         public async Task<IActionResult> CreateChat([FromBody] JsonElement JChat)
         {
-            ChatRoom _chat = JsonSerializer.Deserialize<ChatRoom>(JChat.ToString());
+            var _chat = JsonSerializer.Deserialize<ChatRoom>(JChat.ToString());
+            _chat.Id = MongoDB.Bson.ObjectId.GenerateNewId();
             await chatRoomDB.AddChat(_chat);
-            return Created("Created", JsonSerializer.Serialize(_chat.Id.ToString()));
+            foreach (var user in _chat.Users)
+            {
+                var x = await usersDB.GetUserFromID(user);
+                x.Chats.Add(_chat.Id.ToString());
+                await usersDB.PutUser(x);
+            }
+            return Created("Created", _chat.Id.ToString());
         }
 
         [HttpPut("chat/{ID}")]
@@ -204,7 +209,7 @@ namespace API_DataTransfer.Controllers
         }
 
 
-        [HttpGet("  {ID}")]
+        [HttpGet("chat/{ID}")]
         public async Task<IActionResult> GetSpecifiedChat([FromRoute] string ID)
         {
             var FindChat = await chatRoomDB.GetChatFromID(ID);
