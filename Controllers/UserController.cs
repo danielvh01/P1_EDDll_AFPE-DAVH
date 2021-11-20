@@ -40,6 +40,46 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             return View("/Views/Login/_Login.cshtml", new Login());
         }
 
+        public async Task<IActionResult> Buscar(IFormCollection collecction)
+        {
+            api = new Starter.Starter();
+            Client = api.Start();
+            var RM2 = await Client.GetAsync("api/user/chat/" + collecction["id"]);
+            ChatRoom chatRoom = JsonSerializer.Deserialize<ChatRoom>(RM2.Content.ReadAsStringAsync().Result);
+
+            HttpResponseMessage RM = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
+            User currentuser = JsonSerializer.Deserialize<User>(RM.Content.ReadAsStringAsync().Result);
+            List<Message> messages = new List<Message>();
+            foreach(var mensaje in chatRoom.Messages)
+            {
+                string content;
+                if(chatRoom.type == 1)
+                {
+                    ICipher<int> cipher = new SDES(Path.GetDirectoryName(@"Configuration\"));
+                    if(chatRoom.Users[0] == HttpContext.Session.GetString(SessionUsername))
+                    {
+                        content = GetString(cipher.Decipher(mensaje.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.B, currentuser.a, ViewBag.p)));
+                    }
+                    else
+                    {
+                        content = GetString(cipher.Decipher(mensaje.content.ToArray(), (int)System.Numerics.BigInteger.ModPow(ViewBag.A, currentuser.a, ViewBag.p)));
+                    }
+                }
+                else
+                {
+                    ICipher<int[]> cipher = new RSA();
+                    int[] keys = { mensaje.k1, mensaje.k2 };
+                    content = GetString(cipher.Decipher(mensaje.content.ToArray(), keys));
+                }
+                if(content.Contains(collecction["termino"]))
+                {
+                    messages.Add(mensaje);
+                }
+            }
+            ViewBag.ID = collecction["id"];
+            return View("/Views/Chat/SearchResult.cshtml", messages);
+        }
+
         public ActionResult SubirArchivo(string id)
         {
             ViewBag.ID = id;
@@ -58,7 +98,6 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             return File(content, "application/text", mensaje.title);
         }
 
-        [HttpPost]
         public async Task<ActionResult> _SubirArchivo(FileModel model)
         {
             api = new Starter.Starter();

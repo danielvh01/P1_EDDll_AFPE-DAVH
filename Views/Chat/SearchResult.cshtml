@@ -1,15 +1,9 @@
 ﻿@model List<P1_EDDll_AFPE_DAVH.Models.Message>;
 <nav class="navigation-bar row">
-    <h2 class="text-white col-6 ml-3 p-0 m-0">@ViewBag.Chatname</h2>
-    <form asp-action="Buscar" class="row form">
-        <input type="hidden" name="id" value="ViewBag.ID"/>
-        <input name="termino" class="search-text" type="search" required>
-        <button class="btn-claro my-0 mr-1" type="submit">Buscar</button>
-    </form>
-    <a class="btn-claro my-0" href="@Url.Action("ChatRoom", new { id = ViewBag.ID })">Refrescar</a>
-    <a class="btn-claro my-0" asp-action="ListChat">Regresar</a>
+    <h2 class="text-white col-5 ml-3 p-0 m-0">Busqueda</h2>
+    <a class="btn-claro my-0" href="@Url.Action("ChatRoom", new { id = ViewBag.ID })">Regresar</a>
 </nav>
-@{ 
+@{
 
     DataStructures.ICipher<int> cipher = new DataStructures.SDES(System.IO.Path.GetDirectoryName(@"Configuration\"));
     DataStructures.ICipher<int[]> RSACipher = new DataStructures.RSA();
@@ -84,15 +78,4 @@
             </div>
         }
     }
-    @if (Model.Count == 0)
-    {
-        <h4 class="row emisor-mensaje">No se encontraron resultados</h4>
-    }
 </div>
-<form asp-action="SendMessage" class="footer-emisor row">
-    <button class="col-1 icon-btn" href="@Url.Action("SubirArchivo", new { id = ViewBag.ID})">Subir Archivo</button>
-    <input name="Id" value="@ViewBag.ID" type="hidden"/>
-    <input class="col-10 input-messagge" name="MessageText" type="text" placeholder="Escribe aquí tu mensaje" />
-    <button class="col-1 icon-btn" type="submit">Enviar</button>
-</form>
-

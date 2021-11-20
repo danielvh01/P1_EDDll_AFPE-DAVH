@@ -222,6 +222,22 @@ a {
     border-bottom: 1px solid var(--secundario);
 }
 
+.form{
+    margin: 0px 5px 0px 0px;
+    padding: 0px;
+}
+
+.search-text {
+    font-variant-caps: titling-caps;
+    min-width: 80%;
+    border-radius: 10px;
+    border: 1px var(--secundario) solid;
+    margin: 0px;
+    background-color: var(--blanco);
+    color: var(--principal);
+    font-size: 15px;
+    padding: 15px;
+}
 
 .item {
     color: var(--principal);
