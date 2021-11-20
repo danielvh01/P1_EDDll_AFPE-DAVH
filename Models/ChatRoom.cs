@@ -21,12 +21,11 @@ namespace P1_EDDll_AFPE_DAVH.Models
         public int A { get; set; }
         public int B { get; set; }
 
-        public ChatRoom(List<Message> _Messages, List<string> _Users, int _type, string _name, int _A, int _B)
+        public ChatRoom()
         {
-            Messages = _Messages;
-            Users = _Users;
-            type = _type;
-            name = _name;
+            Messages = new List<Message>();
+            Users = new List<string>();
+            name = "";
             Random rnd = new Random();
 
             int valP = rnd.Next(2, 100);
@@ -41,8 +40,6 @@ namespace P1_EDDll_AFPE_DAVH.Models
             }
             g = valG;
             p = valP;
-            A = _A;
-            B = _B;
         }
 
         bool IsPrime(int number)

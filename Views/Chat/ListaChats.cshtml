@@ -1,4 +1,4 @@
-﻿@model List<P1_EDDll_AFPE_DAVH.Models.Chat>
+﻿@model List<P1_EDDll_AFPE_DAVH.Models.ChatRoom>
 <nav class="navigation-bar row">
     <h2 class="text-white col-9 ml-3 p-0 m-0">Ha iniciado sesión como: @ViewBag.Username</h2>
     <a class="btn-claro my-0" asp-action="ChatType">Nuevo Chat</a>
@@ -9,7 +9,26 @@
     <div class="col-12">
         @foreach (var e in Model)
         {
-            @Html.ActionLink(e.name, "ChatRoom", e.ID, new Dictionary<string, object> { { "class", "pl-4 chat-item row" } });
+        <a href="@Url.Action("ChatRoom", new { id = e.Id.ToString() })" class="pl-4 chat-item row">
+            @if (e.type == 2)
+            {
+                @e.name
+            }
+            else
+            {
+                P1_EDDll_AFPE_DAVH.Starter.Starter api = new P1_EDDll_AFPE_DAVH.Starter.Starter();
+                System.Net.Http.HttpClient Client = api.Start();
+                if (e.Users[0] == ViewBag.Id)
+                {
+
+                    @await Client.GetAsync("api/user/getUsername/" + e.Users[1]).Result.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    @await Client.GetAsync("api/user/getUsername/" + e.Users[0]).Result.Content.ReadAsStringAsync();
+                }
+            }
+        </a>
     }
     </div>
 </div>

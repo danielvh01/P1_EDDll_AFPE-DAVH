@@ -21,8 +21,8 @@
         {
             <div class="row request">
                 <h3 class="col-8 item">@request.Username</h3>
-                <span class="btn-principal">@Html.ActionLink("Aceptar", "AccceptRequest", request)</span>
-                <span class="btn-principal">@Html.ActionLink("Denegar", "DenegateRequest", request)</span>
+                <a class="btn-principal marginx padding-btn" href="@Url.Action("AccceptRequest", request)">Aceptar</a>
+                <a class="btn-principal marginx padding-btn"href="@Url.Action("DenegateRequest", request)">Denegar</a>
             </div>
         }
     </div>

@@ -15,8 +15,6 @@ using DataStructures;
 using System.IO;
 using System.Numerics;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using P1_EDDll_AFPE_DAVH.Models.Data;
 
 namespace P1_EDDll_AFPE_DAVH.Controllers
 {
@@ -188,7 +186,16 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             HttpResponseMessage RM = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
             User currentuser = JsonSerializer.Deserialize<User>(RM.Content.ReadAsStringAsync().Result);
             ViewBag.Username = currentuser.Username;
-            return View("/Views/Chat/ListaChats.cshtml", currentuser.Chats);
+            ViewBag.Id = HttpContext.Session.GetString(SessionID);
+            List<ChatRoom> chats = new List<ChatRoom>();
+            foreach(var c in currentuser.Chats)
+            {
+                var RM2 = await Client.GetAsync("api/user/chat/" + c);
+                var temp = JsonSerializer.Deserialize<ChatRoom>(RM2.Content.ReadAsStringAsync().Result);
+                temp.Id = new ObjectId(c);
+                chats.Add(temp);
+            }
+            return View("/Views/Chat/ListaChats.cshtml", chats);
         }
 
         // GET: UserController/Delete/5
@@ -297,10 +304,65 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
         {
             return View("/Views/Chat/ChatType.cshtml");
         }
-        [HttpPost]
-        public async Task<ActionResult> ChatType(int type)
+
+        public async Task<ActionResult> _ChatType(int type)
         {
+            api = new Starter.Starter();
+            Client = api.Start();
+            var RM = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
+            User currentUser = JsonSerializer.Deserialize<User>(RM.Content.ReadAsStringAsync().Result);
+            if (type == 1)
+            {
+                return View("/Views/Chat/CreateChatP.cshtml", currentUser.Contacts);
+            }
+            else
+            {
+                return View("/Views/Chat/ChatType.cshtml");
+            }
+        }
+
+        public async Task<IActionResult> CreateChatP(Contact contact)
+        {
+            api = new Starter.Starter();
+            Client = api.Start();
+            var RM = await Client.GetAsync("api/user/" + HttpContext.Session.GetString(SessionID));
+            User currentUser = JsonSerializer.Deserialize<User>(RM.Content.ReadAsStringAsync().Result);
+            foreach (var chat in currentUser.Chats)
+            {
+                var RM2 = await Client.GetAsync("api/user/chat/" + chat);
+                ChatRoom chatRoom = JsonSerializer.Deserialize<ChatRoom>(RM2.Content.ReadAsStringAsync().Result);
+                if (chatRoom.type == 1)
+                {
+                    if (chatRoom.Users[0] == contact.ID || chatRoom.Users[1] == contact.ID)
+                    {
+                        TempData["testmsg"] = "Ya existe un chat con este usuario";
+                        return View("/Views/Chat/Room.cshtml", chatRoom.Id);
+                    }
+                }
+            }
             
+            var RM3 = await Client.GetAsync("api/user/" + contact.ID);
+            User user = JsonSerializer.Deserialize<User>(RM3.Content.ReadAsStringAsync().Result);
+            ChatRoom newChat = new ChatRoom();
+            newChat.Id = ObjectId.GenerateNewId();
+            newChat.Users.Add(HttpContext.Session.GetString(SessionID));
+            newChat.Users.Add(contact.ID);
+            newChat.type = 1;
+            newChat.A = (int)BigInteger.ModPow(newChat.g, currentUser.a, newChat.p);
+            newChat.B = (int)BigInteger.ModPow(newChat.g, user.a, newChat.p);
+            var json = JsonSerializer.Serialize(newChat);
+            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+            HttpResponseMessage RM4 = await Client.PostAsync("api/user/createChat", content);
+            if (RM4.IsSuccessStatusCode)
+            {
+                return RedirectToAction(nameof(ChatRoom), new { id = await RM4.Content.ReadAsStringAsync() });
+            }
+            else
+            {
+                var message = await RM4.Content.ReadAsStringAsync();
+                TempData["testmsg"] = "No se pudo crear el chat" + message;
+                return View("/Views/Chat/CreateChatP.cshtml", currentUser.Contacts);
+            }
         }
 
         static byte[] GetBytes(string str)
@@ -315,6 +377,21 @@ namespace P1_EDDll_AFPE_DAVH.Controllers
             char[] chars = new char[bytes.Length / sizeof(char)];
             System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
             return new string(chars);
+        }
+
+        bool IsPrime(int number)
+        {
+            if (number <= 1) return false;
+            if (number == 2) return true;
+            if (number % 2 == 0) return false;
+
+            var boundary = (int)Math.Floor(Math.Sqrt(number));
+
+            for (int i = 3; i <= boundary; i += 2)
+                if (number % i == 0)
+                    return false;
+
+            return true;
         }
 
     }

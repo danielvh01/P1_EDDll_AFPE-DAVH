@@ -17,7 +17,7 @@ namespace P1_EDDll_AFPE_DAVH.Models
         public string Password { get; set; }
         public List<Contact> Contacts { get; set; }
         public List<Contact> ConnectionRequests { get; set; }
-        public List<Chat> Chats { get; set; }
+        public List<string> Chats { get; set; }
         public int a { get; set; }
         public int n { get; set; }
         public int d { get; set;}        
